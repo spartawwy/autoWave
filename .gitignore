@@ -35,3 +35,9 @@
 *.pdb
 *.lastbuildstate
 *.idb
+*.exp
+*.ilk
+*.kd
+build/Win32/Debug/TradeX-M.ini
+*.lic
+*.ini
