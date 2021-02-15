@@ -1,0 +1,463 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
+      <Extensions>qrc;*</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Generated Files">
+      <UniqueIdentifier>{71ED8ED8-ACB9-4CE9-BBE1-E00B30144E11}</UniqueIdentifier>
+      <Extensions>moc;h;cpp</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Generated Files\Debug">
+      <UniqueIdentifier>{22860c3e-850b-46c3-afce-ca02b7320139}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Generated Files\Release">
+      <UniqueIdentifier>{c4e6e38a-655d-466e-be83-ed836ff378ff}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;cxx;c;def</Extensions>
+    </Filter>
+    <Filter Include="Header">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h</Extensions>
+    </Filter>
+    <Filter Include="Form">
+      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
+      <Extensions>ui</Extensions>
+    </Filter>
+    <Filter Include="win">
+      <UniqueIdentifier>{29230190-4ff6-4925-80a9-b5d61c534e8a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="moudle">
+      <UniqueIdentifier>{7ff86872-e788-4913-95f6-3e9646384510}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tdx">
+      <UniqueIdentifier>{c4450e83-7e8b-4e08-80b7-4f9a3e2b6786}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Strategy">
+      <UniqueIdentifier>{30fbb9e4-a797-49e2-a293-7913c413b477}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="deprecate">
+      <UniqueIdentifier>{e4d8dc64-bbc7-4f55-bb50-c61cf5e6fe4e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="GeneratedFiles\Debug\moc_mainwindow.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_mainwindow.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\qrc_mainwindow.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="favorite_codes_serial.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="stkfo_common.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="stock_data_man.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="stock_man.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="stockdayinfo.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="kline_wall.cpp">
+      <Filter>win</Filter>
+    </ClCompile>
+    <ClCompile Include="kline_wall_paint.cpp">
+      <Filter>win</Filter>
+    </ClCompile>
+    <ClCompile Include="mainwindow.cpp">
+      <Filter>win</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="code_list_wall.cpp">
+      <Filter>win</Filter>
+    </ClCompile>
+    <ClCompile Include="database.cpp">
+      <Filter>moudle</Filter>
+    </ClCompile>
+    <ClCompile Include="statistic_dlg.cpp">
+      <Filter>win</Filter>
+    </ClCompile>
+    <ClCompile Include="stockinput_dlg.cpp">
+      <Filter>win</Filter>
+    </ClCompile>
+    <ClCompile Include="title_bar.cpp">
+      <Filter>moudle</Filter>
+    </ClCompile>
+    <ClCompile Include="tool_bar.cpp">
+      <Filter>moudle</Filter>
+    </ClCompile>
+    <ClCompile Include="train_dlg.cpp">
+      <Filter>win</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_code_list_wall.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_code_list_wall.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_title_bar.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_title_bar.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_tool_bar.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_tool_bar.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_train_dlg.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_train_dlg.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_kline_wall.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_kline_wall.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="HintList.cpp">
+      <Filter>moudle</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_HintList.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_HintList.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_statistic_dlg.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_statistic_dlg.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_stockinput_dlg.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_stockinput_dlg.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="futures_forecast_app.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="forcast_man.cpp">
+      <Filter>moudle</Filter>
+    </ClCompile>
+    <ClCompile Include="zhibiao_window.cpp">
+      <Filter>win</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_mock_trade_dlg.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_mock_trade_dlg.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_position_records_table_view.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_position_records_table_view.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="tdx_exhq_wrapper.cpp">
+      <Filter>tdx</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_cfg_stop_profitloss_dlg.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_cfg_stop_profitloss_dlg.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="kline_wall_autoforcast.cpp">
+      <Filter>win</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_cfg_train_dlg.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_cfg_train_dlg.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="stock_data_base.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="kline_wall_train.cpp">
+      <Filter>win</Filter>
+    </ClCompile>
+    <ClCompile Include="strategy.cpp">
+      <Filter>Strategy</Filter>
+    </ClCompile>
+    <ClCompile Include="position_account.cpp">
+      <Filter>moudle</Filter>
+    </ClCompile>
+    <ClCompile Include="mock_trade_dlg.cpp">
+      <Filter>deprecate</Filter>
+    </ClCompile>
+    <ClCompile Include="position_records_table_view.cpp">
+      <Filter>deprecate</Filter>
+    </ClCompile>
+    <ClCompile Include="rwini.cpp">
+      <Filter>moudle</Filter>
+    </ClCompile>
+    <ClCompile Include="strategy_man.cpp">
+      <Filter>Strategy</Filter>
+    </ClCompile>
+    <ClCompile Include="bounceup_strategy.cpp">
+      <Filter>Strategy</Filter>
+    </ClCompile>
+    <ClCompile Include="trenddown_strategy.cpp">
+      <Filter>Strategy</Filter>
+    </ClCompile>
+    <ClCompile Include="zhibiao.cpp">
+      <Filter>moudle</Filter>
+    </ClCompile>
+    <ClCompile Include="trend_distinguish.cpp">
+      <Filter>Strategy</Filter>
+    </ClCompile>
+    <ClCompile Include="breakup_strategy.cpp">
+      <Filter>Strategy</Filter>
+    </ClCompile>
+    <ClCompile Include="config_man.cpp">
+      <Filter>moudle</Filter>
+    </ClCompile>
+    <ClCompile Include="bouncedown_strategy.cpp">
+      <Filter>Strategy</Filter>
+    </ClCompile>
+    <ClCompile Include="float_stop_profit.cpp">
+      <Filter>moudle</Filter>
+    </ClCompile>
+    <ClCompile Include="capital_curve.cpp">
+      <Filter>moudle</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_capital_curve.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_capital_curve.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="auto_trader.cpp">
+      <Filter>deprecate</Filter>
+    </ClCompile>
+    <ClCompile Include="cfg_stop_profitloss_dlg.cpp">
+      <Filter>deprecate</Filter>
+    </ClCompile>
+    <ClCompile Include="cfg_train_dlg.cpp">
+      <Filter>deprecate</Filter>
+    </ClCompile>
+    <ClCompile Include="wave.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="mainwindow.ui">
+      <Filter>Form</Filter>
+    </CustomBuild>
+    <CustomBuild Include="mainwindow.qrc">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="codelistwall.ui">
+      <Filter>Form</Filter>
+    </CustomBuild>
+    <CustomBuild Include="klinewall.ui">
+      <Filter>Form</Filter>
+    </CustomBuild>
+    <CustomBuild Include="statisticdlg.ui">
+      <Filter>Form</Filter>
+    </CustomBuild>
+    <CustomBuild Include="stockinputdlg.ui">
+      <Filter>Form</Filter>
+    </CustomBuild>
+    <CustomBuild Include="traindlg.ui">
+      <Filter>Form</Filter>
+    </CustomBuild>
+    <CustomBuild Include="code_list_wall.h">
+      <Filter>win</Filter>
+    </CustomBuild>
+    <CustomBuild Include="title_bar.h">
+      <Filter>moudle</Filter>
+    </CustomBuild>
+    <CustomBuild Include="tool_bar.h">
+      <Filter>moudle</Filter>
+    </CustomBuild>
+    <CustomBuild Include="train_dlg.h">
+      <Filter>win</Filter>
+    </CustomBuild>
+    <CustomBuild Include="kline_wall.h">
+      <Filter>win</Filter>
+    </CustomBuild>
+    <CustomBuild Include="HintList.h">
+      <Filter>moudle</Filter>
+    </CustomBuild>
+    <CustomBuild Include="statistic_dlg.h">
+      <Filter>win</Filter>
+    </CustomBuild>
+    <CustomBuild Include="stockinput_dlg.h">
+      <Filter>win</Filter>
+    </CustomBuild>
+    <CustomBuild Include="mainwindow.h">
+      <Filter>win</Filter>
+    </CustomBuild>
+    <CustomBuild Include="mocktrade.ui">
+      <Filter>Form</Filter>
+    </CustomBuild>
+    <CustomBuild Include="cfgtrain.ui">
+      <Filter>Form</Filter>
+    </CustomBuild>
+    <CustomBuild Include="cfgstopprofitdlg.ui">
+      <Filter>Form</Filter>
+    </CustomBuild>
+    <CustomBuild Include="mock_trade_dlg.h">
+      <Filter>deprecate</Filter>
+    </CustomBuild>
+    <CustomBuild Include="position_records_table_view.h">
+      <Filter>deprecate</Filter>
+    </CustomBuild>
+    <CustomBuild Include="capital_curve.h">
+      <Filter>moudle</Filter>
+    </CustomBuild>
+    <CustomBuild Include="capitalcurve.ui">
+      <Filter>Form</Filter>
+    </CustomBuild>
+    <CustomBuild Include="cfg_stop_profitloss_dlg.h">
+      <Filter>deprecate</Filter>
+    </CustomBuild>
+    <CustomBuild Include="cfg_train_dlg.h">
+      <Filter>deprecate</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="GeneratedFiles\ui_mainwindow.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_codelistwall.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_klinewall.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_statisticdlg.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_stockinputdlg.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_traindlg.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="futures_forecast_app.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="database.h">
+      <Filter>moudle</Filter>
+    </ClInclude>
+    <ClInclude Include="stkfo_common.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="stock_data_man.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_mocktrade.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\tdxhq\ExHqApi.h">
+      <Filter>tdx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\tdxhq\HqApi.h">
+      <Filter>tdx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\tdxhq\L2HqApi.h">
+      <Filter>tdx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\tdxhq\TradeApi-M.h">
+      <Filter>tdx</Filter>
+    </ClInclude>
+    <ClInclude Include="tdx_exhq_wrapper.h">
+      <Filter>tdx</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_cfgtrain.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_cfgstopprofitdlg.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\exchange_calendar.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\winner_quotation_api.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\sys_common.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="strategy.h">
+      <Filter>Strategy</Filter>
+    </ClInclude>
+    <ClInclude Include="position_account.h">
+      <Filter>moudle</Filter>
+    </ClInclude>
+    <ClInclude Include="forcast_man.h">
+      <Filter>moudle</Filter>
+    </ClInclude>
+    <ClInclude Include="rwini.h">
+      <Filter>moudle</Filter>
+    </ClInclude>
+    <ClInclude Include="strategy_man.h">
+      <Filter>Strategy</Filter>
+    </ClInclude>
+    <ClInclude Include="bounceup_strategy.h">
+      <Filter>Strategy</Filter>
+    </ClInclude>
+    <ClInclude Include="trenddown_strategy.h">
+      <Filter>Strategy</Filter>
+    </ClInclude>
+    <ClInclude Include="trend_distinguish.h">
+      <Filter>Strategy</Filter>
+    </ClInclude>
+    <ClInclude Include="breakup_strategy.h">
+      <Filter>Strategy</Filter>
+    </ClInclude>
+    <ClInclude Include="config_man.h">
+      <Filter>moudle</Filter>
+    </ClInclude>
+    <ClInclude Include="bouncedown_strategy.h">
+      <Filter>Strategy</Filter>
+    </ClInclude>
+    <ClInclude Include="float_stop_profit.h">
+      <Filter>moudle</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_capitalcurve.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="auto_trader.h">
+      <Filter>deprecate</Filter>
+    </ClInclude>
+    <ClInclude Include="wave.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="trend_line.h">
+      <Filter>src</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="autowave.rc" />
+  </ItemGroup>
+</Project>
