@@ -23,6 +23,7 @@ class StockMan;
 class MainWindow;
 class KLineWall;
 class WaveMan;
+class TrendLineMan;
 class FuturesForecastApp : public QApplication, public TSystem::ServerClientAppBase
 {
     //Q_OBJECT
@@ -41,6 +42,7 @@ public:
 
     StockDataMan & stock_data_man() { return *stock_data_man_; }
     WaveMan & wave_man() { return *wave_man_; }
+    TrendLineMan & trend_line_man() { return *trend_line_man_; }
 
     MainWindow * main_window() { return main_window_.get(); }
     CapitalCurve& capital_curve();
@@ -79,6 +81,9 @@ private:
     //-----------------------
     std::shared_ptr<WaveMan>  wave_man_;
     //-----------------------
+    std::shared_ptr<TrendLineMan> trend_line_man_;
+    //-----------------------
+
     bool exit_flag_;
      
     std::atomic<unsigned int> forecast_id_;

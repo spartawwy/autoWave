@@ -106,6 +106,6 @@ private:
 
     std::unordered_map<std::string, std::unordered_map<TypePeriod, std::deque<std::shared_ptr<Wave> > > > code_type_waves_;
 };
-bool Traverse_GetWaves(IN T_StructLineContainer &container, IN T_HisDataItemContainer & kline_data_items, int r_start_index, int backward_size, OUT Wave &wave);
+//bool Traverse_GetWaves(IN T_StructLineContainer &container, IN T_HisDataItemContainer & kline_data_items, int r_start_index, int backward_size, OUT Wave &wave);
 
 #endif // WAVE_HEADER_DSFKJDF_H_

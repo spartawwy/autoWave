@@ -266,6 +266,9 @@
     <ClCompile Include="wave.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="trend_line.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="mainwindow.ui">

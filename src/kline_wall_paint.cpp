@@ -22,6 +22,7 @@
 #include "exchange_calendar.h"
 #include "strategy_man.h"  
 #include "wave.h"
+#include "trend_line.h"
 
 static const int cst_default_year = 2017;
 static const Qt::CursorShape cst_cur_del_forcst_line = Qt::ClosedHandCursor;
@@ -76,6 +77,7 @@ KLineWall::KLineWall(FuturesForecastApp *app, QWidget *parent, int index, TypePe
     , is_draw_struct_line_(false)
     , is_draw_section_(false)
     , is_draw_wave_(true)
+    , is_draw_trend_line_(true)
     , right_clicked_k_date_(0)
     , right_clicked_k_hhmm_(0)
     , train_step_type_(TypePeriod::PERIOD_1M)
@@ -611,6 +613,45 @@ void KLineWall::DrawSection(QPainter &painter, const int mm_h)
     };
     painter.setPen(old_pen);
     painter.setBrush(old_brush);
+}
+
+void KLineWall::DrawTrendLine(QPainter &painter, const int mm_h)
+{
+    T_HisDataItemContainer & his_data = *p_hisdata_container_;
+    const int end_index = his_data.size() - k_rend_index_ - 1;
+    if( end_index < 0 )
+        return;
+
+    QPen old_pen = painter.pen();
+    int start_index = his_data.size() - k_rend_index_  - k_num_;
+    if( start_index < 0 )
+        start_index = 0;
+    auto p_trend_down_line = app_->trend_line_man().FindTrendLine(stock_code_, k_type_, TrendLineType::DOWN);
+    if( p_trend_down_line && p_trend_down_line->beg_ >= start_index && p_trend_down_line->end_ <= end_index )
+    { 
+        QPen down_line_pen;  
+        down_line_pen.setStyle(Qt::SolidLine);
+        down_line_pen.setColor(Qt::green);
+        down_line_pen.setWidth(1);
+        painter.setPen(down_line_pen);
+        painter.drawLine(his_data[p_trend_down_line->beg_]->kline_posdata(wall_index_).top  
+            , his_data[p_trend_down_line->end_]->kline_posdata(wall_index_).top);
+    }
+
+    auto p_trend_up_line = app_->trend_line_man().FindTrendLine(stock_code_, k_type_, TrendLineType::UP);
+
+    //if( p_trend_up_line && p_trend_up_line->beg_ >= 0 && !Equal(p_trend_up_line->k_, 0.0) )
+    if( p_trend_up_line && p_trend_up_line->beg_ >= start_index && p_trend_up_line->end_ <= end_index )
+    {
+        QPen up_line_pen;  
+        up_line_pen.setStyle(Qt::SolidLine);
+        up_line_pen.setColor(Qt::red);
+        up_line_pen.setWidth(1);
+        painter.setPen(up_line_pen);
+        painter.drawLine(his_data[p_trend_up_line->beg_]->kline_posdata(wall_index_).bottom  
+            , his_data[p_trend_up_line->end_]->kline_posdata(wall_index_).bottom);
+    }
+    painter.setPen(old_pen);
 }
 
 void KLineWall::UpdatePosDatas()
@@ -1412,6 +1453,8 @@ void KLineWall::paintEvent(QPaintEvent*)
             DrawSection(painter, k_mm_h);
         if( is_draw_wave_ )
             DrawWave(painter, k_mm_h);
+        if( is_draw_trend_line_ )
+            DrawTrendLine(painter, k_mm_h);
 
         // paint handle forecast ----------------------
         Draw2pDownForcast(painter, k_mm_h, item_w, forcast_man_);
@@ -1965,6 +2008,7 @@ bool KLineWall::LoadBaseStock(const QString& code, TypePeriod type_period, bool 
         app_->stock_data_man().TraverseSetFeatureData(stock_code_, ToPeriodType(k_type_), is_index_, 0);
         app_->wave_man().Traverse_GetWaveLevel1(stock_code_, k_type_, 0, 0);
         app_->wave_man().TraverseSetTrendDataTowardRight(stock_code_, k_type_, 0);
+        app_->trend_line_man().CreateTrendLine(stock_code_, k_type_);
 
         this->is_index_ = is_index;
         if( !p_hisdata_container_->empty() )
@@ -2025,6 +2069,7 @@ bool KLineWall::LoadBaseStock(const QString& code, TypePeriod type_period, bool 
         app_->stock_data_man().TraverseSetFeatureData(stock_code_, ToPeriodType(k_type_), is_index_, 0);
         app_->wave_man().Traverse_GetWaveLevel1(stock_code_, k_type_, 0, 0);
         app_->wave_man().TraverseSetTrendDataTowardRight(stock_code_, k_type_, 0);
+        app_->trend_line_man().CreateTrendLine(stock_code_, k_type_);
 
         this->is_index_ = is_index;
         if( !p_hisdata_container_->empty() )

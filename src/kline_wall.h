@@ -210,6 +210,7 @@ private:
     void DrawStructLine(QPainter &painter, const int mm_h);
     void DrawWave(QPainter &painter, const int mm_h);
     void DrawSection(QPainter &painter, const int mm_h);
+    void DrawTrendLine(QPainter &painter, const int mm_h);
 
     void UpdatePosDatas();
     void UpdateKwallMinMaxPrice();
@@ -321,6 +322,8 @@ private:
     bool is_draw_struct_line_;
     bool is_draw_section_;
     bool is_draw_wave_;
+    bool is_draw_trend_line_;
+
     std::mutex  painting_mutex_;
 
     int  right_clicked_k_date_; // right mouse click

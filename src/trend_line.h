@@ -1,22 +1,60 @@
 #ifndef TREND_LINE_H_DSFDSKJK_
 #define TREND_LINE_H_DSFDSKJK_
 
+#include <deque>
 #include "stock_data_man.h"
-#if 0 
-void  CreateTrendLine()
-{ 
-    T_HisDataItemContainer &k_datas = app_->stock_data_man().GetHisDataContainer(k_type_, stock_code_);
 
-    const int T = 120;
-    int cst_cur_index = k_datas.size() - 1;
+enum class TrendLineType{ UP, DOWN};
+class  TrendLine
+{
+public:
+    TrendLine(TrendLineType type) : type_(type), beg_(-1), end_(-1), k_(0.0)
+    {
+    }
+    TrendLine(TrendLineType type, int beg, int end, double k) : type_(type), beg_(beg), end_(end), k_(k)
+    {
+    }
+    TrendLine(const TrendLine& lh) : type_(lh.type_), beg_(lh.beg_), end_(lh.end_), k_(lh.k_)
+    {
+    }
+    TrendLine & operator = (const TrendLine& lh)
+    {
+        if( this == &lh )
+            return *this;
+        type_ = lh.type_;
+        beg_ = lh.beg_;
+        end_ = lh.end_;
+        k_ = lh.k_;
+        return *this;
+    }
+    int beg_;
+    int end_;
+    double k_;
+    TrendLineType  type_;
+};
 
-    int right_end_index = cst_cur_index;
-    int left_end_index = MAX_VAL(cst_cur_index - T, 0);
+class FuturesForecastApp;
+class TrendLineMan
+{
+public:
+    TrendLineMan(FuturesForecastApp &app) 
+        : app_(app)/*, down_line_(TrendLine(TrendLineType::DOWN)), up_line_(TrendLine(TrendLineType::UP))*/
+    {
+    }
 
-    // find previous 2 trading period windows 's start index
-    int temp_index = PreTradeDaysOrNightsStartIndex(*app_->exchange_calendar(), k_type_, k_datas, right_end_index, 3);
-    if( temp_index > -1 )
-        left_end_index = temp_index;
-}
-#endif
-#endif
+    void  CreateTrendLine(const std::string &code, TypePeriod type_period);
+
+    TrendLine * FindTrendLine(const std::string &code, TypePeriod type_period, TrendLineType trend_line_type);
+    TrendLine & GetTrendLine(const std::string &code, TypePeriod type_period, TrendLineType trend_line_type);
+
+private:
+    FuturesForecastApp &app_;
+    //TrendLine down_line_;
+    //TrendLine up_line_;
+
+    //<code, ...>
+    std::unordered_map<std::string, std::unordered_map<TypePeriod, std::unordered_map<TrendLineType, std::shared_ptr<TrendLine> > > > code_type_trend_lines_;
+
+};
+
+#endif // TREND_LINE_H_DSFDSKJK_

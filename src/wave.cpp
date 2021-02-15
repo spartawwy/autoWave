@@ -6,12 +6,6 @@ void FindDownTowardLeftEnd(std::deque<std::shared_ptr<T_KlineDataItem> > &kline_
 void FindUpTowardLeftEnd(std::deque<std::shared_ptr<T_KlineDataItem> > &kline_data_items, bool is_src_k_same, double highest_price, int start, INOUT int &end);
 
 
-bool Traverse_GetWaves(IN T_StructLineContainer &container, IN T_HisDataItemContainer & kline_data_items, int r_start_index, int backward_size, OUT Wave &wave)
-{
-    return true;
-}
-
-
 // return index 
 // ps : towards left items' right end related r_start_index == 0  
 int WaveMan::Traverse_GetWaveLevel1(const std::string &code, TypePeriod type_period, int r_start_index, int backward_size/*, OUT std::deque<std::shared_ptr<Wave> > &container*/)

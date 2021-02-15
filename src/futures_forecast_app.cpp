@@ -18,6 +18,7 @@
 #include "capital_curve.h"
 
 #include "wave.h"
+#include "trend_line.h"
 
 #include "strategy_man.h" 
 
@@ -33,6 +34,7 @@ FuturesForecastApp::FuturesForecastApp(int argc, char* argv[])
     //, stock_man_(nullptr)
     , stock_data_man_(nullptr)
     , wave_man_(nullptr)
+    , trend_line_man_(nullptr)
     , strategy_man_(nullptr)
     , main_window_(nullptr)
     , exit_flag_(false)
@@ -97,6 +99,7 @@ bool FuturesForecastApp::Init()
 
     //T_HisDataItemContainer &kdata_container = stock_data_man_->GetHisDataContainer(DEFAULT_MAINKWALL_TYPE_PERIOD, config_man_->contract_info().code);
     wave_man_ = std::make_shared<WaveMan>(*this);
+    trend_line_man_ = std::make_shared<TrendLineMan>(*this);
 
     main_window_ = std::make_shared<MainWindow>(this);
     if( !main_window_->Initialize() )

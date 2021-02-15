@@ -41,3 +41,6 @@
 build/Win32/Debug/TradeX-M.ini
 *.lic
 *.ini
+*.opensdf
+*.sdf
+*.suo

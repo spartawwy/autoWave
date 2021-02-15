@@ -212,6 +212,7 @@
     <ClCompile Include="position_account.cpp" />
     <ClCompile Include="trenddown_strategy.cpp" />
     <ClCompile Include="trend_distinguish.cpp" />
+    <ClCompile Include="trend_line.cpp" />
     <ClCompile Include="wave.cpp" />
     <ClCompile Include="zhibiao.cpp" />
     <ClCompile Include="zhibiao_window.cpp" />

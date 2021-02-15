@@ -412,9 +412,9 @@ bool MainWindow::eventFilter(QObject *o, QEvent *e)
         case QEvent::MouseMove:
             return true;
         default: return false; // ndchk
-        }
-        
+        } 
     } 
+    return false; // 20120216
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *e)
