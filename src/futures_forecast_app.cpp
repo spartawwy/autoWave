@@ -105,7 +105,11 @@ bool FuturesForecastApp::Init()
     if( !main_window_->Initialize() )
         return false;  
     main_window_->show();
-
+#if 0
+    // cause Init will invoke UpdatePosDatas inderectry, and kwall's size will changed after main_window_->show()
+    if( !main_window_->MainKlineWall()->Init() )
+        return false;
+#endif
     strategy_man_ = std::make_shared<StrategyMan>(*this);
     if( !strategy_man_->Init() )
     {
@@ -117,7 +121,7 @@ bool FuturesForecastApp::Init()
     this->task_pool().PostTask([this]()
     {
         int count = 0;
-        int milli_second = 300;  //500
+        int milli_second = 50;//100; //300;  //500
         while( !exit_flag_ )
         {
             Delay(milli_second);

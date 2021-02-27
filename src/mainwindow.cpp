@@ -81,7 +81,14 @@ bool MainWindow::Initialize()
 {  
     // https://blog.csdn.net/qq_28093585/article/details/78517358
     this->setWindowFlags(Qt::FramelessWindowHint);  
-    this->setGeometry(100, 100, cst_win_width, cst_win_height);
+    //this->setGeometry(100, 100, cst_win_width, cst_win_height);
+
+    auto desktop_wid = QApplication::desktop();
+    //获取设备屏幕大小
+    QRect screenRect = desktop_wid->screenGeometry();
+
+    this->setGeometry(0, 0, screenRect.width() * 0.8, screenRect.height() * 0.8);
+
 #ifndef _DEBUG
     auto cur_date = QDate::currentDate().year() * 10000 + QDate::currentDate().month() * 100 + QDate::currentDate().day();
     if( cur_date > 20191225 )
@@ -121,13 +128,15 @@ bool MainWindow::Initialize()
     view_layout->setSpacing(1);  
 
     kline_wall_main_ = new KLineWall(app_, this, (int)WallIndex::MAIN, DEFAULT_MAINKWALL_TYPE_PERIOD);
+#if 1
     if( !kline_wall_main_->Init() )
-        return false;
+        return false;  
+#endif
     kline_wall_main_->setMouseTracking(true);
     //kline_wall_main_->ResetTypePeriod(DEFAULT_MAINKWALL_TYPE_PERIOD);
     kline_wall_main_->setFocusPolicy(Qt::StrongFocus);
     view_layout->addWidget(kline_wall_main_);
-     
+    
 #ifdef MAKE_SUB_WALL
     kline_wall_sub_ = new KLineWall(app_, this, (int)WallIndex::SUB, DEFAULT_SUBKWALL_TYPE_PERIOD);
     if( !kline_wall_sub_->Init() )
@@ -182,13 +191,13 @@ bool MainWindow::Initialize()
     ui->statusBar->showMessage("hello",2000); 
     ui->statusBar->addPermanentWidget(ui->labelCurrentTime);
 #endif
-
-    auto desktop_wid = QApplication::desktop();
-    //获取设备屏幕大小
-    QRect screenRect = desktop_wid->screenGeometry();
-
-    this->setGeometry(0, 0, screenRect.width() * 0.8, screenRect.height() * 0.8);
-
+      
+#if 0 
+    auto ck_val = kline_wall_main_->height();
+    if( !kline_wall_main_->Init() )
+        return false; 
+    auto ck_val1 = kline_wall_main_->height();
+#endif
     /*g_nActScreenX = screenRect.width();
     g_nActScreenY = screenRect.height();*/
 

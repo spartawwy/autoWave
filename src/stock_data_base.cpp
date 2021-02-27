@@ -196,6 +196,28 @@ std::tuple<int, FractalGeneralType> FractalLast(T_HisDataItemContainer & items, 
     return std::make_tuple(-1, FractalGeneralType::UNKNOW);
 }
 
+int FractalLast(T_HisDataItemContainer & items, FractalGeneralType fractal_type, int start, int left_end)
+{
+    assert(start > -1 && start < items.size());  
+    assert(left_end > -1 && left_end < items.size());  
+    assert(start > left_end);
+    for( int i = start-1; i >= left_end; i-- )
+    {
+        switch (fractal_type)
+        {
+        case FractalGeneralType::TOP_FRACTAL:
+            if( IsTopFractal(items[i]->type) ) return i; break;
+        case FractalGeneralType::BTM_FRACTAL:
+            if( IsBtmFractal(items[i]->type) ) return i; break;
+        case FractalGeneralType::UNKNOW:
+            if( !IsTopFractal(items[i]->type) && !IsBtmFractal(items[i]->type) ) return i; break;
+        default: assert(false);
+            break;
+        }
+    }
+    return -1;
+}
+
 // find first special fenxin toward right [start, right_end]
 // ret -1: not find
 int FractalFirst(T_HisDataItemContainer & items, FractalGeneralType fractal_type, int start, int right_end)

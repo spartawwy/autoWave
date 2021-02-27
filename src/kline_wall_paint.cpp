@@ -1,6 +1,7 @@
 
 #include "kline_wall.h"
 
+#include <cfloat>
 #include <cassert>
 #include <tuple>
 #include <array>
@@ -11,6 +12,8 @@
 #include <QtWidgets/QMessageBox>
 #include <QMenu>
 #include <QAction>
+
+#include "ui_klinewall.h"
 
 #include <TLib/core/tsystem_utility_functions.h>
 
@@ -72,7 +75,7 @@ KLineWall::KLineWall(FuturesForecastApp *app, QWidget *parent, int index, TypePe
     , forcast_man_(app, index)
     , auto_forcast_man_(app, index)
     , cur_select_forcast_(nullptr)
-    , is_draw_fengxin_(false)
+    , is_draw_fengxin_(true)
     , is_draw_bi_(false)
     , is_draw_struct_line_(false)
     , is_draw_section_(false)
@@ -83,7 +86,8 @@ KLineWall::KLineWall(FuturesForecastApp *app, QWidget *parent, int index, TypePe
     , train_step_type_(TypePeriod::PERIOD_1M)
     , train_start_date_(0)
 {
-    ui.setupUi(this);
+    ui = std::make_shared<Ui_KLineWallForm>();
+    ui->setupUi(this);
     ResetDrawState(DrawAction::NO_ACTION); 
  
     // init ui -----------
@@ -614,7 +618,7 @@ void KLineWall::DrawSection(QPainter &painter, const int mm_h)
     painter.setPen(old_pen);
     painter.setBrush(old_brush);
 }
-
+#if 1 
 void KLineWall::DrawTrendLine(QPainter &painter, const int mm_h)
 {
     T_HisDataItemContainer & his_data = *p_hisdata_container_;
@@ -626,34 +630,226 @@ void KLineWall::DrawTrendLine(QPainter &painter, const int mm_h)
     int start_index = his_data.size() - k_rend_index_  - k_num_;
     if( start_index < 0 )
         start_index = 0;
-    auto p_trend_down_line = app_->trend_line_man().FindTrendLine(stock_code_, k_type_, TrendLineType::DOWN);
-    if( p_trend_down_line && p_trend_down_line->beg_ >= start_index && p_trend_down_line->end_ <= end_index )
-    { 
-        QPen down_line_pen;  
-        down_line_pen.setStyle(Qt::SolidLine);
-        down_line_pen.setColor(Qt::green);
-        down_line_pen.setWidth(1);
-        painter.setPen(down_line_pen);
-        painter.drawLine(his_data[p_trend_down_line->beg_]->kline_posdata(wall_index_).top  
-            , his_data[p_trend_down_line->end_]->kline_posdata(wall_index_).top);
-    }
-
-    auto p_trend_up_line = app_->trend_line_man().FindTrendLine(stock_code_, k_type_, TrendLineType::UP);
-
-    //if( p_trend_up_line && p_trend_up_line->beg_ >= 0 && !Equal(p_trend_up_line->k_, 0.0) )
-    if( p_trend_up_line && p_trend_up_line->beg_ >= start_index && p_trend_up_line->end_ <= end_index )
+    auto p_trend_down_line_container = app_->trend_line_man().FindTrendLineContainer(stock_code_, k_type_, TrendLineType::DOWN);
+    for( unsigned int i = 0; p_trend_down_line_container && i < p_trend_down_line_container->size(); ++i )
     {
-        QPen up_line_pen;  
-        up_line_pen.setStyle(Qt::SolidLine);
-        up_line_pen.setColor(Qt::red);
-        up_line_pen.setWidth(1);
-        painter.setPen(up_line_pen);
-        painter.drawLine(his_data[p_trend_up_line->beg_]->kline_posdata(wall_index_).bottom  
-            , his_data[p_trend_up_line->end_]->kline_posdata(wall_index_).bottom);
+        auto p_trend_down_line = p_trend_down_line_container->at(i);
+        if( p_trend_down_line && p_trend_down_line->beg_ >= start_index && p_trend_down_line->end_ <= end_index )
+        { 
+            QPen down_line_pen;  
+            down_line_pen.setStyle(Qt::SolidLine);
+            down_line_pen.setColor(Qt::green);
+            down_line_pen.setWidth(1);
+            painter.setPen(down_line_pen);
+            painter.drawLine(his_data[p_trend_down_line->beg_]->kline_posdata(wall_index_).top  
+                , his_data[p_trend_down_line->end_]->kline_posdata(wall_index_).top);
+            
+        }
     }
+
+    auto p_trend_up_line_container = app_->trend_line_man().FindTrendLineContainer(stock_code_, k_type_, TrendLineType::UP);
+    for( unsigned int i = 0; p_trend_up_line_container && i < p_trend_up_line_container->size(); ++i )
+    {
+        auto p_trend_up_line = p_trend_up_line_container->at(i);
+        if( p_trend_up_line && p_trend_up_line->beg_ >= 0 && !Equal(p_trend_up_line->slope_, 0.0) )
+        {
+            QPen up_line_pen;  
+            up_line_pen.setStyle(Qt::SolidLine);
+            up_line_pen.setColor(Qt::red);
+            up_line_pen.setWidth(1);
+            QPen up_line_dead_pen;  
+            up_line_dead_pen.setStyle(Qt::DotLine);
+            up_line_dead_pen.setColor(Qt::red);
+            up_line_dead_pen.setWidth(1);
+            // painter.drawLine(his_data[p_trend_up_line->beg_]->kline_posdata(wall_index_).bottom  
+            //    , his_data[p_trend_up_line->end_]->kline_posdata(wall_index_).bottom);
+
+            //-----------------------------
+            //if( p_trend_up_line->end_ >= start_index && p_trend_up_line->end_ <= end_index )
+            if( p_trend_up_line->beg_ >= 0 && p_trend_up_line->end_ >= 0 )
+            {
+                painter.setPen(p_trend_up_line->is_alive_ ? up_line_pen : up_line_dead_pen);
+                //const int mm_h = Calculate_k_mm_h();
+                double start_index_price = (start_index - p_trend_up_line->end_) * p_trend_up_line->slope_ + KRef(his_data, p_trend_up_line->end_, KAttributeType::LOW);
+                double end_index_price = (end_index - p_trend_up_line->end_) * p_trend_up_line->slope_ + KRef(his_data, p_trend_up_line->end_, KAttributeType::LOW);
+                double start_index_y = get_price_y(start_index_price, mm_h);
+                double end_index_y = get_price_y(end_index_price, mm_h);
+                QPointF start_index_point(his_data[start_index]->kline_posdata(wall_index_).bottom.x(), start_index_y);
+                QPointF end_index_point(his_data[end_index]->kline_posdata(wall_index_).bottom.x(), end_index_y);
+                painter.drawLine(start_index_point  //his_data[p_trend_up_line->end_]->kline_posdata(wall_index_).bottom
+                    , end_index_point);
+
+                char buf[128] = {'\0'};
+                sprintf_s(buf, sizeof(buf), "%d(%.4f)", p_trend_up_line->id_, p_trend_up_line->slope_);
+                QPen pen; 
+                pen.setColor(Qt::darkYellow);
+                painter.setPen(pen);
+                painter.drawText(end_index_point, buf);
+
+            }else if( p_trend_up_line->beg_ >= start_index && p_trend_up_line->beg_ <= end_index )
+            {
+
+            }
+        }
+    }// for
     painter.setPen(old_pen);
 }
+#elif 0
+void KLineWall::DrawTrendLine(QPainter &painter, const int mm_h) // codes for draw mid axis line
+{
+    T_HisDataItemContainer & his_data = *p_hisdata_container_;
+    const int end_index = his_data.size() - k_rend_index_ - 1;
+    if( end_index < 0 )
+        return;
 
+    QPen old_pen = painter.pen();
+    int start_index = his_data.size() - k_rend_index_  - k_num_;
+    if( start_index < 0 )
+        start_index = 0;
+    int h_i = Highest(his_data, start_index, end_index - start_index);
+    int l_i = Lowest(his_data, start_index, end_index - start_index);
+    int mid_i = (h_i + l_i) / 2;
+    double h_p = KRef(his_data, h_i, KAttributeType::HIGH);
+    double l_p = KRef(his_data, l_i, KAttributeType::LOW);
+    double mid_p = (h_p + l_p) / 2;
+
+    double tgt_slop = 0.0;
+
+    int start_i = MIN_VAL(h_i, l_i);
+    int end_i = MAX_VAL(h_i, l_i);
+    double min_distance = FLT_MAX;
+    for(double slop = -10; slop < 10.1; slop += 0.01 )
+    {
+        double total_distance = 0.0;
+        //for( int i = start_index; i <= end_index; ++i )
+        for( int i = start_i; i <= end_i; ++i )
+        {
+            double line_value = (i - mid_i) * slop + mid_p;
+            if( line_value > h_p || line_value < l_p )
+            {
+                total_distance = FLT_MAX;
+                break;
+            }
+#if 1
+            if( IsBtmFractal(his_data[i]->type) || i == l_i )
+            { 
+                double price = KRef(his_data, i, KAttributeType::LOW);
+                total_distance += price - line_value;
+            }else if( IsTopFractal(his_data[i]->type) || i == h_i )
+            { 
+                double price = KRef(his_data, i, KAttributeType::HIGH);
+                total_distance += price - line_value;
+            } 
+#else
+            double price_l = KRef(his_data, i, KAttributeType::LOW);
+            total_distance += price_l - line_value;
+            double price_h = KRef(his_data, i, KAttributeType::HIGH);
+            total_distance += price_h - line_value;
+#endif
+        }
+        if( fabs(total_distance) < fabs(min_distance) )
+        {
+            if( h_i > l_i && slop < 0 || h_i < l_i && slop > 0 )
+                continue;
+            min_distance = total_distance;
+            tgt_slop = slop;
+        }
+    }// for 
+
+    QPen up_line_dead_pen;  
+    up_line_dead_pen.setStyle(Qt::DotLine);
+    up_line_dead_pen.setColor(Qt::red);
+    up_line_dead_pen.setWidth(1);
+             
+    painter.setPen(up_line_dead_pen);
+
+    double start_index_price = (start_index - mid_i) * tgt_slop + mid_p;
+    double end_index_price = (end_index  - mid_i) * tgt_slop + mid_p;
+    double start_index_y = get_price_y(start_index_price, mm_h);
+    double end_index_y = get_price_y(end_index_price, mm_h);
+    QPointF start_index_point(his_data[start_index]->kline_posdata(wall_index_).bottom.x(), start_index_y);
+    QPointF end_index_point(his_data[end_index]->kline_posdata(wall_index_).bottom.x(), end_index_y);
+    painter.drawLine(start_index_point  //his_data[p_trend_up_line->end_]->kline_posdata(wall_index_).bottom
+        , end_index_point);
+   
+}
+#elif 1
+void KLineWall::DrawTrendLine(QPainter &painter, const int mm_h) // codes for draw mid axis line
+{
+    T_HisDataItemContainer & his_data = *p_hisdata_container_;
+    const int end_index = his_data.size() - k_rend_index_ - 1;
+    if( end_index < 0 )
+        return;
+
+    QPen old_pen = painter.pen();
+    int start_index = his_data.size() - k_rend_index_  - k_num_;
+    if( start_index < 0 )
+        start_index = 0;
+    int h_i = Highest(his_data, start_index, end_index - start_index);
+    int l_i = Lowest(his_data, start_index, end_index - start_index);
+    int mid_i = (h_i + l_i) / 2;
+    double h_p = KRef(his_data, h_i, KAttributeType::HIGH);
+    double l_p = KRef(his_data, l_i, KAttributeType::LOW);
+    double mid_p = (h_p + l_p) / 2;
+
+    double tgt_slop = 0.0;
+    const bool is_tgt_slop_positive = h_i > l_i;
+
+    int start_i = MIN_VAL(h_i, l_i);
+    int end_i = MAX_VAL(h_i, l_i);
+    double min_distance = FLT_MAX;
+    for(double slop = -10; slop < 10.1; slop += 0.01 )
+    {
+        double total_distance = 0.0;
+         
+        for( int i = start_i; i <= end_i; ++i )
+        {
+            double line_value = (i - mid_i) * slop + mid_p;
+            if( line_value > h_p || line_value < l_p )
+            {
+                total_distance = FLT_MAX;
+                break;
+            }
+#if 1 
+            if( is_tgt_slop_positive && (IsBtmFractal(his_data[i]->type) || i == l_i) )
+            { 
+                double price = KRef(his_data, i, KAttributeType::LOW);
+                total_distance += price - line_value;
+            }else if( !is_tgt_slop_positive && (IsTopFractal(his_data[i]->type) || i == h_i) )
+            { 
+                double price = KRef(his_data, i, KAttributeType::HIGH);
+                total_distance += price - line_value;
+            } 
+ 
+#endif
+        }
+        if( fabs(total_distance) < fabs(min_distance) )
+        {
+            if( is_tgt_slop_positive && slop < 0 || !is_tgt_slop_positive && slop > 0 )
+                continue;
+            min_distance = total_distance;
+            tgt_slop = slop;
+        }
+    }// for 
+
+    QPen up_line_dead_pen;  
+    up_line_dead_pen.setStyle(Qt::DotLine);
+    up_line_dead_pen.setColor(Qt::red);
+    up_line_dead_pen.setWidth(1);
+
+    painter.setPen(up_line_dead_pen);
+
+    double start_index_price = (start_index - mid_i) * tgt_slop + mid_p;
+    double end_index_price = (end_index  - mid_i) * tgt_slop + mid_p;
+    double start_index_y = get_price_y(start_index_price, mm_h);
+    double end_index_y = get_price_y(end_index_price, mm_h);
+    QPointF start_index_point(his_data[start_index]->kline_posdata(wall_index_).bottom.x(), start_index_y);
+    QPointF end_index_point(his_data[end_index]->kline_posdata(wall_index_).bottom.x(), end_index_y);
+    painter.drawLine(start_index_point  //his_data[p_trend_up_line->end_]->kline_posdata(wall_index_).bottom
+        , end_index_point);
+
+}
+#endif
 void KLineWall::UpdatePosDatas()
 {
     assert(p_hisdata_container_);
@@ -808,6 +1004,11 @@ void KLineWall::UpdatePosDatas()
 
 END_PROC:
     painting_mutex_.unlock();
+}
+
+void KLineWall::resizeEvent(QResizeEvent * event)
+{
+    UpdatePosDatas();
 }
 
 void KLineWall::mousePressEvent(QMouseEvent * event )
@@ -1451,8 +1652,8 @@ void KLineWall::paintEvent(QPaintEvent*)
             DrawStructLine(painter, k_mm_h);
         if( is_draw_section_ )
             DrawSection(painter, k_mm_h);
-        if( is_draw_wave_ )
-            DrawWave(painter, k_mm_h);
+        //if( is_draw_wave_ )
+        //    DrawWave(painter, k_mm_h);
         if( is_draw_trend_line_ )
             DrawTrendLine(painter, k_mm_h);
 
@@ -2008,7 +2209,7 @@ bool KLineWall::LoadBaseStock(const QString& code, TypePeriod type_period, bool 
         app_->stock_data_man().TraverseSetFeatureData(stock_code_, ToPeriodType(k_type_), is_index_, 0);
         app_->wave_man().Traverse_GetWaveLevel1(stock_code_, k_type_, 0, 0);
         app_->wave_man().TraverseSetTrendDataTowardRight(stock_code_, k_type_, 0);
-        app_->trend_line_man().CreateTrendLine(stock_code_, k_type_);
+        app_->trend_line_man().CreateTrendUpLine(stock_code_, k_type_);
 
         this->is_index_ = is_index;
         if( !p_hisdata_container_->empty() )
@@ -2069,7 +2270,7 @@ bool KLineWall::LoadBaseStock(const QString& code, TypePeriod type_period, bool 
         app_->stock_data_man().TraverseSetFeatureData(stock_code_, ToPeriodType(k_type_), is_index_, 0);
         app_->wave_man().Traverse_GetWaveLevel1(stock_code_, k_type_, 0, 0);
         app_->wave_man().TraverseSetTrendDataTowardRight(stock_code_, k_type_, 0);
-        app_->trend_line_man().CreateTrendLine(stock_code_, k_type_);
+        app_->trend_line_man().CreateTrendUpLine(stock_code_, k_type_);
 
         this->is_index_ = is_index;
         if( !p_hisdata_container_->empty() )
@@ -2431,6 +2632,7 @@ T_StockHisDataItem * KLineWall::UpdateIfNecessary(int target_date, int target_hh
                 app_->stock_data_man().AppendStructLinesIfNeccary(ToPeriodType(k_type_), stock_code_, temp_lines);
                 int occure_index = app_->wave_man().Traverse_GetWaveLevel1(stock_code_, k_type_, 0, backward_size);
                 app_->wave_man().TraverseSetTrendDataTowardRight(stock_code_, k_type_, occure_index);
+                app_->trend_line_man().Update(stock_code_, k_type_, container.size()-1, container.back()->stk_item);
             }
 
             if( ret == 1 )

@@ -269,6 +269,9 @@
     <ClCompile Include="trend_line.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="trend_up_line_strategy.cpp">
+      <Filter>Strategy</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="mainwindow.ui">
@@ -458,6 +461,9 @@
     </ClInclude>
     <ClInclude Include="trend_line.h">
       <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="trend_up_line_strategy.h">
+      <Filter>Strategy</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

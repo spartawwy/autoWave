@@ -306,6 +306,7 @@ int KLineWall::FindBtmFakeItem_TowardLeft(T_HisDataItemContainer &his_data, T_Hi
 
 int KLineWall::Calculate_k_mm_h()
 {
+    auto val = this->height();
     int mm_h = this->height() - HeadHeight() - BottomHeight();
     for( unsigned int i = 0 ; i < zb_windows_.size(); ++i )
     {

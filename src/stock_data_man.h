@@ -212,7 +212,8 @@ int BarFirst(T_HisDataItemContainer & items, int start, int right_end, KAttribut
 
 // find last bar(kline) from start(not include start) to left which is fenxin k. [left_end, start)
 std::tuple<int, FractalGeneralType> FractalLast(T_HisDataItemContainer & items, int start, int left_end);
-
+// find last bar(kline) from start(not include start) to left which is fenxin k. [left_end, start)
+int FractalLast(T_HisDataItemContainer & items, FractalGeneralType fractal_type, int start, int left_end);
 // find first special fenxin toward right [start, right_end]
 int FractalFirst(T_HisDataItemContainer & items, FractalGeneralType fractal_type, int start, int right_end);
 // find fenxin toward left [left_end, start)

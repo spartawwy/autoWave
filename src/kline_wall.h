@@ -4,8 +4,6 @@
 #include <mutex>
 #include <QtWidgets/QWidget>
 
-#include "ui_klinewall.h"
-
 #include "stock_data_man.h"
 #ifdef STK_INPUT_KWALL
 #include "stockinput_dlg.h"
@@ -42,6 +40,7 @@ struct  TradeRecordKwallPosInfo
     double pos;
 };
 
+class Ui_KLineWallForm;
 class ExchangeCalendar;
 class FuturesForecastApp;
 class MainWindow;
@@ -171,6 +170,7 @@ public slots:
 protected:
 
     void paintEvent(QPaintEvent*) override;
+    void resizeEvent(QResizeEvent * event) override;
 	void mousePressEvent( QMouseEvent * event ) override;
     void mouseReleaseEvent(QMouseEvent * e) override;
 
@@ -242,7 +242,7 @@ private:
     //-------------------------------------------------------
     FuturesForecastApp *app_;
     MainWindow  *main_win_;
-	Ui_KLineWallForm  ui;
+	std::shared_ptr<Ui_KLineWallForm>  ui;
     const int wall_index_;
 
     const double head_h_percent_;
