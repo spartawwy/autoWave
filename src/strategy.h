@@ -70,6 +70,7 @@ bool IsNightTradingBegTime(const T_QuoteData &quote);
 bool IsNearDayTradeTimeEnd(const T_QuoteData &quote);
 bool IsNearNightTradeTimeEnd(const T_QuoteData &quote);
 
+
 static const unsigned int cst_position_max = 3;
 static const double cst_tolerance_min = 0.1;
 static const double cst_tolerance_max = 0.3;

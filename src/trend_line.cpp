@@ -6,6 +6,7 @@
 
 #include "futures_forecast_app.h"
 #include "exchange_calendar.h"
+#include "strategy_man.h"
 
 #define  IS_DEL_UNLIVE_LINE 0
 #define  TAG_TREND_LINE_LOG  "trendline"
@@ -416,6 +417,8 @@ void  TrendLineMan::Update(const std::string &code, TypePeriod type_period, int 
     T_HisDataItemContainer &k_datas = app_.stock_data_man().GetHisDataContainer(type_period, code);
     if( k_datas.size() < 2 )
         return;
+    //if( !IsNearCloseKTime(quote_k.hhmmss*100, type_period) )
+    //    return;
     int cst_cur_index = k_datas.size() - 1;
     double cst_cur_price = quote_k.close_price;
 
@@ -488,20 +491,25 @@ void  TrendLineMan::Update(const std::string &code, TypePeriod type_period, int 
 #endif
         }
     }
-    //-----------------------del really break lines ----------------------------
-    // find last alive trend up line
-    last_trend_up_line_ = nullptr;
+    // ---------set last alive trend up line---------------
+    //last_trend_up_line_ = nullptr;
+    bool is_exists_up_line = false;
     if( p_trend_up_line_container )
     {
         for( unsigned int i = p_trend_up_line_container->size(); i > 0; --i)
         {
             if( p_trend_up_line_container->at(i-1)->is_alive_ )
             {
-                last_trend_up_line_ = p_trend_up_line_container->at(i-1);
+                last_trend_up_line(p_trend_up_line_container->at(i-1));
+                is_exists_up_line = true;
                 break;
             }
         }
     }
+    if( !is_exists_up_line )
+        last_trend_up_line(nullptr);
+    //-----------------------del really break lines ----------------------------
+
     std::deque<std::shared_ptr<TrendLine> > useful_lines;
     for( unsigned int i = 0; p_trend_up_line_container && i < p_trend_up_line_container->size(); ++i )
     {
@@ -620,7 +628,7 @@ void  TrendLineMan::Update(const std::string &code, TypePeriod type_period, int 
     }
 #endif
     bool is_k_close = true;
-
+    
     if( is_k_close )
     { 
 #if 0 
@@ -645,7 +653,16 @@ void  TrendLineMan::Update(const std::string &code, TypePeriod type_period, int 
                 {
                     app_.local_logger().LogLocal(TAG_TREND_LINE_LOG
                         , utility::FormatStr("last_trend_up_line_ null to judge CreateTrendUpLine"));
-                    bool ret = CreateTrendUpLine(code, type_period);
+                    unsigned int last_line_id = line_id_;
+                    auto p_line = CreateTrendUpLine(code, type_period);
+                    if( last_line_id != line_id_ )
+                    {
+                        assert(p_line);
+                        auto line = FindTrendLineById(line_id_);
+                        assert(line);
+                        assert(p_line->id_ == line->id_);
+                        app_.strategy_man()->AppendTrendLineStrategy(line);
+                    }
                 }
             }
 
@@ -660,8 +677,10 @@ void  TrendLineMan::Update(const std::string &code, TypePeriod type_period, int 
                 , cst_cur_index, last_trend_up_line_->id_, last_trend_up_line_->h_price_index_));
             auto p_line = CreateTrendUpLine(code, type_period, last_trend_up_line_.get());
 
-            if( p_line && p_line->id_ != last_trend_up_line_->id_ )
+            if( p_line && p_line->id_ > last_trend_up_line_->id_ )
             {
+                auto line = FindTrendLineById(p_line->id_);
+                app_.strategy_man()->AppendTrendLineStrategy(line);
                 del_unnecessary_uplines(app_, k_datas, cst_cur_index, *p_trend_up_line_container, *p_line);
 #if 0
                 std::deque<std::shared_ptr<TrendLine> > alive_lines;
@@ -717,8 +736,10 @@ void  TrendLineMan::Update(const std::string &code, TypePeriod type_period, int 
                     , utility::FormatStr("cur_index %d index:%d near or break last_trend_up_line_(id%d) h_price_index_:%d to judge CreateTrendUpLineByDoubleTop"
                     , cst_cur_index, min_price_i, last_trend_up_line_->id_, last_trend_up_line_->h_price_index_));
                 auto p_line = CreateTrendUpLineByDoubleTop(code, type_period, last_trend_up_line_->beg_, cst_cur_index);
-                if( p_line && p_line->id_ != last_trend_up_line_->id_ )
+                if( p_line && p_line->id_ > last_trend_up_line_->id_ )
                 {
+                    auto line = FindTrendLineById(p_line->id_);
+                    app_.strategy_man()->AppendTrendLineStrategy(line);
                     del_unnecessary_uplines(app_, k_datas, cst_cur_index, *p_trend_up_line_container, *p_line);
                 }
             }
@@ -838,17 +859,21 @@ TrendLine & TrendLineMan::GetLastTrendLine(const std::string &code, TypePeriod t
         iter2 = iter1->second.insert(std::make_pair(trend_line_type, std::deque<std::shared_ptr<TrendLine> >())).first;
     //iter2 = iter1->second.insert(std::make_pair(trend_line_type, std::make_shared<TrendLine>(trend_line_type))).first;
     if( iter2->second.empty() )
-        iter2->second.push_back(std::make_shared<TrendLine>(trend_line_type));
-     
+    {
+        auto trend_line = std::make_shared<TrendLine>(trend_line_type);
+        trend_line->id_ = GenerateLineId();
+        iter2->second.push_back(trend_line);
+        id_trend_lines_[trend_line->id_] = trend_line;
+    }
     return *(iter2->second.back());
 }
 
-TrendLine * TrendLineMan::FindLastTrendLineById(unsigned int id)
+std::shared_ptr<TrendLine> TrendLineMan::FindTrendLineById(unsigned int id)
 {
     auto iter = id_trend_lines_.find(id);
     if( iter == id_trend_lines_.end() )
         return nullptr;
-    return iter->second.get();
+    return iter->second;
 }
 
 TrendLine * TrendLineMan::FindTrendLine(const std::string &code, TypePeriod type_period, TrendLineType trend_line_type, int line_beg, int line_end)

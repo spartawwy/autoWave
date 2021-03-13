@@ -453,6 +453,7 @@ void ClearBtmFractal(T_KlineDataItem &k_data_item);
 
  
 int cur_hhmm();
+bool IsNearCloseKTime(int hhmmss, TypePeriod type_period);
 
 KGreenRedType KGGetGreenRedType(const T_StockHisDataItem &item, TypePeriod type_period);
 

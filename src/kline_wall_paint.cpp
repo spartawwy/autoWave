@@ -2630,8 +2630,10 @@ T_StockHisDataItem * KLineWall::UpdateIfNecessary(int target_date, int target_hh
                 T_StructLineContainer temp_lines;
                 Traverse_GetStuctLines(container, 0, backward_size, temp_lines);
                 app_->stock_data_man().AppendStructLinesIfNeccary(ToPeriodType(k_type_), stock_code_, temp_lines);
+
                 int occure_index = app_->wave_man().Traverse_GetWaveLevel1(stock_code_, k_type_, 0, backward_size);
                 app_->wave_man().TraverseSetTrendDataTowardRight(stock_code_, k_type_, occure_index);
+
                 app_->trend_line_man().Update(stock_code_, k_type_, container.size()-1, container.back()->stk_item);
             }
 
@@ -2774,6 +2776,8 @@ void KLineWall::UpdateIfNecessary(const T_QuoteData &quote_data)
                 TraverseSetUpwardFractal(container, 0, backward_size);
                 TraverseSetDownwardFractal(container, 0, backward_size);
                 TraverseAjustFractal(container, 0, backward_size);
+
+                app_->trend_line_man().Update(stock_code_, k_type_, container.size()-1, container.back()->stk_item);
             }
 
             if( ret == 1 )

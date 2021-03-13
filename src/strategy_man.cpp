@@ -5,6 +5,7 @@
 #include "bounceup_strategy.h"
 #include "bouncedown_strategy.h"
 #include "breakup_strategy.h"
+#include "line_strategy_man.h"
 
 #include "futures_forecast_app.h"
 #include "capital_curve.h"
@@ -17,6 +18,8 @@ StrategyMan::StrategyMan(FuturesForecastApp &app):app_(app)
 
 bool StrategyMan::Init()
 {
+    line_strategy_man_ = std::make_shared<LineStrategyMan>(app_, account_info_);
+
     trend_distinguish_ = std::make_shared<TrendDistinguish>(app_, account_info_);
     trend_distinguish_->Init();
 #if 0
@@ -44,6 +47,8 @@ bool StrategyMan::Init()
 
 void StrategyMan::Handle(const T_QuoteData &quote)
 {  
+    line_strategy_man_->Handle(quote);
+
     trend_distinguish_->Handle(quote);
 
     auto enabled_strategys = GetEnabledStrategys();
@@ -82,4 +87,9 @@ void StrategyMan::AppendTradeRecord(OrderAction action, PositionAtom &positon_at
 std::vector<std::shared_ptr<Strategy> > StrategyMan::GetEnabledStrategys()
 {
     return strategys_;
+}
+
+void StrategyMan::AppendTrendLineStrategy(std::shared_ptr<TrendLine> &trend_line)
+{
+    line_strategy_man_->AppendStrategy(trend_line);
 }

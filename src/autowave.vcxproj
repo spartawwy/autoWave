@@ -190,6 +190,7 @@
     <ClCompile Include="kline_wall_autoforcast.cpp" />
     <ClCompile Include="kline_wall_paint.cpp" />
     <ClCompile Include="kline_wall_train.cpp" />
+    <ClCompile Include="line_strategy_man.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mainwindow.cpp" />
     <ClCompile Include="mock_trade_dlg.cpp" />
@@ -252,6 +253,7 @@
     <ClInclude Include="bouncedown_strategy.h" />
     <ClInclude Include="bounceup_strategy.h" />
     <ClInclude Include="breakup_strategy.h" />
+    <ClInclude Include="line_strategy_man.h" />
     <ClInclude Include="trend_line.h" />
     <ClInclude Include="trend_up_line_strategy.h" />
     <ClInclude Include="wave.h" />

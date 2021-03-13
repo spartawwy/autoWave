@@ -140,7 +140,7 @@ void TrendDistinguish::Handle(const T_QuoteData &quote)
     };
 
 
-    if( sub_hisdatas_->size() < 4 )
+    if( !sub_hisdatas_ || sub_hisdatas_->size() < 4 )
         return;
 
     const int minute = quote.hhmmss % 10000 / 100;

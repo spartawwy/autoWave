@@ -224,3 +224,5 @@ bool IsNearNightTradeTimeEnd(const T_QuoteData &quote)
     // close position when near by trading end time 
     return hhmm >= 225 && hhmm < 800;
 }
+
+

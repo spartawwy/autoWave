@@ -7,6 +7,8 @@
 class FuturesForecastApp;
 class Strategy;
 class TrendDistinguish;
+class TrendLine;
+class LineStrategyMan;
 class StrategyMan
 {
 public:
@@ -18,6 +20,7 @@ public:
     void Handle(const T_QuoteData &quote);
 
     void AppendTradeRecord(OrderAction action, PositionAtom &positon_atom, const T_QuoteData &quote, int index);
+    void AppendTrendLineStrategy(std::shared_ptr<TrendLine> &);
 
     AccountInfo & account_info(){ return account_info_; }
 
@@ -30,6 +33,7 @@ private:
     std::shared_ptr<TrendDistinguish> trend_distinguish_;
 
     std::vector<std::shared_ptr<Strategy> > strategys_;
+    std::shared_ptr<LineStrategyMan> line_strategy_man_;
 };
 
 #endif // STRATEGY_MAN_SDFS_H_

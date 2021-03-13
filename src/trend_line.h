@@ -32,19 +32,19 @@ class  TrendLine
 {
 public:
     TrendLine(TrendLineType type) : id_(0), type_(type), beg_(-1), end_(-1), slope_(0.0)
-        , h_price_index_(-1), l_price_index_(-1), is_alive_(true), is_double_top_(false)
+        , h_price_index_(-1), l_price_index_(-1), is_alive_(true), is_double_top_(false), is_last_(true)
     {
         is_below_price_ = type == TrendLineType::UP ? true : false;
     }
     TrendLine(TrendLineType type, int beg, int end, double slope, int h_p_index, int l_p_index) : id_(0), type_(type), beg_(beg), end_(end), slope_(slope)
-        , h_price_index_(h_p_index), l_price_index_(l_p_index), is_alive_(true), is_double_top_(false)
+        , h_price_index_(h_p_index), l_price_index_(l_p_index), is_alive_(true), is_double_top_(false), is_last_(true)
     {
         is_below_price_ = type == TrendLineType::UP ? true : false;
     }
     TrendLine(const TrendLine& lh) : id_(lh.id_), type_(lh.type_), beg_(lh.beg_), end_(lh.end_), slope_(lh.slope_)
         , breakdown_infos_(lh.breakdown_infos_),breakup_infos_(lh.breakup_infos_)
         , h_price_index_(lh.h_price_index_), l_price_index_(lh.l_price_index_), is_below_price_(lh.is_below_price_)
-        , is_alive_(lh.is_alive_), is_double_top_(lh.is_double_top_)
+        , is_alive_(lh.is_alive_), is_double_top_(lh.is_double_top_), is_last_(lh.is_last_)
     {
     }
     TrendLine & operator = (const TrendLine& lh)
@@ -63,6 +63,7 @@ public:
         is_below_price_ = lh.is_below_price_;
         is_alive_ = lh.is_alive_;
         is_double_top_ = lh.is_double_top_;
+        is_last_ = lh.is_last_;
         return *this;
     }
     T_BreakAtomInfo * FindBreakInfo(bool is_break_up, int k_index)
@@ -87,6 +88,7 @@ public:
     bool is_below_price_;
     bool is_alive_;
     bool is_double_top_;
+    bool is_last_;
     std::deque<T_BreakAtomInfo> breakdown_infos_;
     std::deque<T_BreakAtomInfo> breakup_infos_;
     
@@ -117,15 +119,33 @@ public:
     std::deque<std::shared_ptr<TrendLine> > * FindTrendLineContainer(const std::string &code, TypePeriod type_period, TrendLineType trend_line_type);
     TrendLine * FindLastTrendLine(const std::string &code, TypePeriod type_period, TrendLineType trend_line_type);
     TrendLine & GetLastTrendLine(const std::string &code, TypePeriod type_period, TrendLineType trend_line_type);
-    TrendLine * FindLastTrendLineById(unsigned int id);
     TrendLine * FindTrendLine(const std::string &code, TypePeriod type_period, TrendLineType trend_line_type, int line_beg, int line_end);
+    
+    std::shared_ptr<TrendLine> FindTrendLineById(unsigned int id);
 
     TrendLine * AppendTrendLine(const std::string &code, TypePeriod type_period, const std::shared_ptr<TrendLine> &trend_line, bool is_use_second_lh = false);
 
     unsigned int GenerateLineId(){ return ++line_id_; }
 
     //bool IsDoubleTopShape();
-
+    std::shared_ptr<TrendLine> last_trend_up_line() { return last_trend_up_line_;}
+    void last_trend_up_line(const std::shared_ptr<TrendLine> &line)
+    {
+        if( !line )
+        {
+            if( last_trend_up_line_ )
+            {
+                last_trend_up_line_->is_last_ = false;
+                last_trend_up_line_ = nullptr;
+            }
+        }else
+        {
+            if( last_trend_up_line_ && last_trend_up_line_->id_ != line->id_ )
+                last_trend_up_line_->is_last_ = false;
+            last_trend_up_line_ = line; 
+            last_trend_up_line_->is_last_ = true;
+        }
+    }
 private:
     int SolveTrendUpLineEndIndex(T_HisDataItemContainer &k_datas, int lowest_index, int highest_index, OUT double &rel_slop);
 

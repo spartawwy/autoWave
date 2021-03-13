@@ -25,11 +25,11 @@
 #include "winner_quotation_api.h"
 #pragma comment(lib, "quotation_api.lib")
 
-static const bool cst_is_use_fenbi = false;
+static const bool cst_is_use_fenbi = true;
 
 FuturesForecastApp::FuturesForecastApp(int argc, char* argv[])
     : QApplication(argc, argv)
-    , ServerClientAppBase("client", "autoforcast", "0.1")
+    , ServerClientAppBase("client", "autowave", "0.1")
     , data_base_(nullptr)
     //, stock_man_(nullptr)
     , stock_data_man_(nullptr)

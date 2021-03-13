@@ -352,6 +352,20 @@ int cur_hhmm()
     return timeinfo.tm_hour * 100 + timeinfo.tm_min;
 }
 
+bool IsNearCloseKTime(int hhmmss, TypePeriod type_period)
+{
+    const int minute = hhmmss % 10000 / 100;
+    const int second = hhmmss % 100; 
+    // time near close k(5 minute k)
+    switch (type_period)
+    {
+    case TypePeriod::PERIOD_5M: 
+        return (minute % 5 == 0 && second == 0) || (minute % 5 == 4 && second > 56);
+    default:
+        return false;
+    }
+}
+
 void utf8ToGbk(std::string& strUtf8)
 {
     QTextCodec* utf8Codec = QTextCodec::codecForName("utf-8");
