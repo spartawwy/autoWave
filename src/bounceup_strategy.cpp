@@ -145,6 +145,7 @@ void BounceUpStrategy::JudgeOpenShort(const T_QuoteData &quote, INOUT unsigned i
             positon_atom->rel_forcast_info = rel_info;
             positon_atom->price = quote.price;
             positon_atom->is_long = is_long;
+            positon_atom->help_info.strategy_id = id_;
             if( spread_type <= PriceSpreadType::MICRO )
             {
                 positon_atom->stop_loss_price = quote.price + cst_bounceup_stop_distance;
@@ -252,7 +253,8 @@ void BounceUpStrategy::JudgeStopShortLoss(const T_QuoteData &quote, INOUT unsign
     {
         int trade_id = iter->first;
         auto pos_atom = account_info_.position.FindPositionAtom(trade_id);
-        if( pos_atom )
+        if( !pos_atom || pos_atom->help_info.strategy_id != id_ )
+            continue; 
         {
             if( quote.price > pos_atom->stop_loss_price - cst_tolerance_equal )
             {
@@ -288,8 +290,8 @@ void BounceUpStrategy::JudgeStopShortProfit(const T_QuoteData &quote)
     {
         int trade_id = iter->first;
         auto pos_atom = account_info_.position.FindPositionAtom(trade_id);
-        if( !pos_atom )
-            continue;
+        if( !pos_atom || pos_atom->help_info.strategy_id != id_ )
+            continue; 
         assert(pos_atom->qty_all() == 1);
         if( quote.price < pos_atom->stop_profit_price + cst_tolerance_equal )
         {

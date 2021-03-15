@@ -29,12 +29,15 @@ FollowStopProfit::FollowStopProfit(PositionAtom &postion_atom, double enable_thr
 // ------------------------------------------------------
 //return : is to stop profit or loss;
 // ------------------------------------------------------
-bool FollowStopProfit::UpdateAndJudgeStop(double price)
+bool FollowStopProfit::UpdateAndJudgeStop(double price, std::string *p_ret_info)
 {  
     const double max_target_profit = (postion_atom_.is_long ? max_target_ - postion_atom_.price : postion_atom_.price - max_target_); //10.0;
-#if 1
+
     double max_profit_touch = (postion_atom_.is_long ? max_profit_price_touch_ - postion_atom_.price : postion_atom_.price - max_profit_price_touch_);
-    if( max_profit_touch > 0.3 )//0.4
+#if 0  // 20210314
+    // prevent has certain amount profit to loss    
+    //if( max_profit_touch > 0.3 )//0.4
+    if( max_profit_touch > 0.9 )// 20210314
     {
         const double cst_stop_loss_distance = 0.1;
         double stop_price = (postion_atom_.is_long ? postion_atom_.price - cst_stop_loss_distance : postion_atom_.price + cst_stop_loss_distance);
@@ -51,9 +54,12 @@ bool FollowStopProfit::UpdateAndJudgeStop(double price)
     }else 
     {
         double dynamic_bake_rate = max_back_rate_;
-        if( max_profit_touch > 2.0 - EPSINON && max_profit_touch < 4.0 )
+        if( (postion_atom_.is_long && price - postion_atom_.price > max_target_profit - EPSINON) 
+            || (!postion_atom_.is_long && postion_atom_.price - price > max_target_profit - EPSINON) )
+            dynamic_bake_rate = 0.16;
+        else if( max_profit_touch > 2.0 - EPSINON && max_profit_touch < 4.0 )
             dynamic_bake_rate = 0.618;
-        if( max_profit_touch > 4.0 && max_profit_touch < 8.0 )
+        else if( max_profit_touch > 4.0 && max_profit_touch < 8.0 )
             dynamic_bake_rate = 0.333;
         else if( max_profit_touch > 8.0 - EPSINON && max_profit_touch < 9.5 )
             dynamic_bake_rate = 0.233;
@@ -61,29 +67,37 @@ bool FollowStopProfit::UpdateAndJudgeStop(double price)
             dynamic_bake_rate = 0.16;
         if( postion_atom_.is_long )
         {
-            if( price - postion_atom_.price > max_target_profit )
-                return true;
+            //if( price - postion_atom_.price > max_target_profit )
+            //    return true;
             if( max_profit_price_touch_ < postion_atom_.price + enable_threshold_price_ )
                 return false;
             else
                 enabled_ = true;
             assert( !(max_profit_price_touch_ < price)  ); 
             if( max_profit_price_touch_ > postion_atom_.price ) // profit
-                return (max_profit_price_touch_ - price) / max_profit_touch > dynamic_bake_rate;
-            else // loss
+            {
+                bool is_stop = (max_profit_price_touch_ - price) / max_profit_touch > dynamic_bake_rate;
+                if( is_stop && p_ret_info )
+                   *p_ret_info = utility::FormatStr("(%.1f-%.1f)/%.1f > %.1f", max_profit_price_touch_, price, max_profit_touch, dynamic_bake_rate);
+                return is_stop;
+            }else // loss
                 return false;
         }else // short position
         {
-            if( postion_atom_.price - price > max_target_profit )
-                return true;
+            //if( postion_atom_.price - price > max_target_profit )
+            //   return true;
             if( max_profit_price_touch_ > postion_atom_.price - enable_threshold_price_ )
                 return false;
             else
                 enabled_ = true;
             assert( !(max_profit_price_touch_ > price)  ); 
             if( max_profit_price_touch_ < postion_atom_.price ) // profit
-                return (price - max_profit_price_touch_) / max_profit_touch > dynamic_bake_rate;
-            else // loss
+            {
+                bool is_stop = (price - max_profit_price_touch_) / max_profit_touch > dynamic_bake_rate;
+                if( is_stop && p_ret_info )
+                    *p_ret_info = utility::FormatStr("(%.1f-%.1f)/%.1f > %.1f", price, max_profit_price_touch_, max_profit_touch, dynamic_bake_rate);
+                return is_stop;
+            }else // loss
                 return false;
         }
     }
@@ -120,7 +134,7 @@ StepStopProfit::StepStopProfit(PositionAtom &postion_atom, const StepProfitPara 
 // ------------------------------------------------------
 //return : is to stop profit or loss;
 // ------------------------------------------------------
-bool StepStopProfit::UpdateAndJudgeStop(double price)
+bool StepStopProfit::UpdateAndJudgeStop(double price, std::string *p_ret_info)
 {  
     //const double max_target_profit = (postion_atom_.is_long ? max_target_ - postion_atom_.price : postion_atom_.price - max_target_); //10.0;
 #if 1

@@ -111,6 +111,7 @@ void BounceDownStrategy::JudgeOpenLong(const T_QuoteData &quote, unsigned int sh
             positon_atom->rel_forcast_info = rel_info;
             positon_atom->price = quote.price;
             positon_atom->is_long = is_long;
+            positon_atom->help_info.strategy_id = id_;
             if( spread_type <= PriceSpreadType::MICRO )
             {
                 positon_atom->stop_loss_price = quote.price - cst_bouncedown_stop_distance;
@@ -215,8 +216,9 @@ void BounceDownStrategy::JudgeStopLongLoss(const T_QuoteData &quote, unsigned in
     {
         int trade_id = iter->first;
         auto pos_atom = account_info_.position.FindPositionAtom(trade_id);
-        if( pos_atom )
-        {
+        if( !pos_atom || pos_atom->help_info.strategy_id != id_ )
+            continue; 
+        { 
             if( quote.price < pos_atom->stop_loss_price + cst_tolerance_equal )
             {
                 double margin_ret = 0.0;

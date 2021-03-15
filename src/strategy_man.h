@@ -23,7 +23,7 @@ public:
     void AppendTrendLineStrategy(std::shared_ptr<TrendLine> &);
 
     AccountInfo & account_info(){ return account_info_; }
-
+    unsigned int GenerateId(){ return ++id_; }
 protected:
     std::vector<std::shared_ptr<Strategy> > GetEnabledStrategys();
 
@@ -32,8 +32,10 @@ private:
     AccountInfo account_info_;
     std::shared_ptr<TrendDistinguish> trend_distinguish_;
 
-    std::vector<std::shared_ptr<Strategy> > strategys_;
+    std::unordered_map<unsigned int, std::shared_ptr<Strategy> > strategys_;
     std::shared_ptr<LineStrategyMan> line_strategy_man_;
+    std::atomic<unsigned int> id_;
+
 };
 
 #endif // STRATEGY_MAN_SDFS_H_

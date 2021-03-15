@@ -13,7 +13,7 @@
 StrategyMan::StrategyMan(FuturesForecastApp &app):app_(app)
     , trend_distinguish_(nullptr)
 {
-
+    account_info_.capital.avaliable = cst_default_ori_capital;
 }
 
 bool StrategyMan::Init()
@@ -27,10 +27,10 @@ bool StrategyMan::Init()
     strategy->Initiate();
     strategys_.push_back(strategy);
 #endif
-#if 1
+#if 0
     auto strategy_bounceup = std::make_shared<BounceUpStrategy>(app_, account_info_, trend_distinguish_);
     strategy_bounceup->Initiate();
-    strategys_.push_back(strategy_bounceup);
+    strategys_.insert(std::make_pair(strategy_bounceup->id(), strategy_bounceup));
 #endif
 #if 0
     auto strategy_bouncedown = std::make_shared<BounceDownStrategy>(app_, account_info_, trend_distinguish_);
@@ -86,7 +86,10 @@ void StrategyMan::AppendTradeRecord(OrderAction action, PositionAtom &positon_at
 
 std::vector<std::shared_ptr<Strategy> > StrategyMan::GetEnabledStrategys()
 {
-    return strategys_;
+    std::vector<std::shared_ptr<Strategy> > ret;
+    for( auto iter= strategys_.begin(); iter != strategys_.end(); ++iter )
+        ret.push_back(iter->second);
+    return ret;
 }
 
 void StrategyMan::AppendTrendLineStrategy(std::shared_ptr<TrendLine> &trend_line)

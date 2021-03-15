@@ -18,6 +18,7 @@ public:
 
     virtual void Initiate(){}
     virtual void Handle(const T_QuoteData &quote) = 0;
+    unsigned int id(){ return id_; }
 
 protected:
 
@@ -25,11 +26,11 @@ protected:
     void JudgeTrend(const T_QuoteData &quote);
 
     unsigned int NetPosition();
-    void ClosePositionAtom(const T_QuoteData &quote, int trade_id, PositionAtom *pos_atom, unsigned int short_pos_qty, unsigned int &long_pos_qty);
+    void ClosePositionAtom(const T_QuoteData &quote, int trade_id, PositionAtom *pos_atom, unsigned int &short_pos_qty, unsigned int &long_pos_qty);
      
     virtual bool ProdIfNearTradingEndTime(const T_QuoteData &quote);
     virtual void Strategy_Log(const std::string &content, const T_QuoteData *quote=nullptr);
-
+    
 protected:
 
     FuturesForecastApp &app_;
@@ -44,6 +45,8 @@ protected:
     TypePeriod sub_k_type_;
      
     double pre_price_;
+
+    const unsigned int id_;
 
     Data2pForcastInnerContainer *main_bounce_ups_ ;
     Data2pForcastInnerContainer *main_bounce_downs_;

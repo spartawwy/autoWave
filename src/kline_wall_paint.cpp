@@ -2270,7 +2270,7 @@ bool KLineWall::LoadBaseStock(const QString& code, TypePeriod type_period, bool 
         app_->stock_data_man().TraverseSetFeatureData(stock_code_, ToPeriodType(k_type_), is_index_, 0);
         app_->wave_man().Traverse_GetWaveLevel1(stock_code_, k_type_, 0, 0);
         app_->wave_man().TraverseSetTrendDataTowardRight(stock_code_, k_type_, 0);
-        app_->trend_line_man().CreateTrendUpLine(stock_code_, k_type_);
+        //app_->trend_line_man().CreateTrendUpLine(stock_code_, k_type_);
 
         this->is_index_ = is_index;
         if( !p_hisdata_container_->empty() )

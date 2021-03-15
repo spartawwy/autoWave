@@ -11,7 +11,7 @@ public:
     virtual ~FloatStopProfit(){}
     FloatStopProfit(const FloatStopProfit &lh):enabled_(lh.enabled_), postion_atom_(lh.postion_atom_), max_profit_price_touch_(lh.max_profit_price_touch_){}
     
-    virtual bool UpdateAndJudgeStop(double price) = 0;
+    virtual bool UpdateAndJudgeStop(double price, std::string *p_ret_info=nullptr) = 0;
     virtual std::string String(double price) = 0;
 
 protected:
@@ -36,7 +36,7 @@ public:
     // ------------------------------------------------------
     //return : is to stop profit or loss;
     // ------------------------------------------------------
-    virtual bool UpdateAndJudgeStop(double price) override;
+    virtual bool UpdateAndJudgeStop(double price, std::string *p_ret_info=nullptr) override;
 
     virtual std::string String(double price) override;
 
@@ -76,7 +76,7 @@ public:
     // ------------------------------------------------------
     //return : is to stop profit or loss;
     // ------------------------------------------------------
-    virtual bool UpdateAndJudgeStop(double price) override;
+    virtual bool UpdateAndJudgeStop(double price, std::string *p_ret_info=nullptr) override;
     virtual std::string String(double price) override;
 
 private:

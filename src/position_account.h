@@ -130,11 +130,11 @@ struct PosAtomHelpInfo
     double small_aim;
     double mid_aim;
     double big_aim;
-    
+    unsigned int strategy_id;
     PosAtomHelpInfo(): has_near_small_aim(false), has_near_mid_aim(false), has_near_big_aim(false), small_aim(99999.9), mid_aim(99999.9), big_aim(99999.9)
-    , is_remain(false){}
+    , is_remain(false), strategy_id(0){}
     PosAtomHelpInfo(const PosAtomHelpInfo &lh): has_near_small_aim(lh.has_near_small_aim), has_near_mid_aim(lh.has_near_mid_aim), has_near_big_aim(lh.has_near_big_aim)
-    , small_aim(lh.small_aim), mid_aim(lh.mid_aim), big_aim(lh.big_aim), is_remain(lh.is_remain){}
+    , small_aim(lh.small_aim), mid_aim(lh.mid_aim), big_aim(lh.big_aim), is_remain(lh.is_remain), strategy_id(lh.strategy_id){}
     PosAtomHelpInfo& operator = (const PosAtomHelpInfo& lh)
     { 
         if( this == &lh ) 
@@ -143,6 +143,7 @@ struct PosAtomHelpInfo
         {
             has_near_small_aim = lh.has_near_small_aim; has_near_mid_aim = lh.has_near_mid_aim; has_near_big_aim = lh.has_near_big_aim; 
             small_aim = lh.small_aim; mid_aim = lh.mid_aim; big_aim = lh.big_aim; is_remain = lh.is_remain;
+            strategy_id = lh.strategy_id;
         }
         return *this;
     }

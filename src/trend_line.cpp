@@ -680,6 +680,7 @@ void  TrendLineMan::Update(const std::string &code, TypePeriod type_period, int 
             if( p_line && p_line->id_ > last_trend_up_line_->id_ )
             {
                 auto line = FindTrendLineById(p_line->id_);
+                assert(line);
                 app_.strategy_man()->AppendTrendLineStrategy(line);
                 del_unnecessary_uplines(app_, k_datas, cst_cur_index, *p_trend_up_line_container, *p_line);
 #if 0
@@ -739,6 +740,7 @@ void  TrendLineMan::Update(const std::string &code, TypePeriod type_period, int 
                 if( p_line && p_line->id_ > last_trend_up_line_->id_ )
                 {
                     auto line = FindTrendLineById(p_line->id_);
+                    assert(line);
                     app_.strategy_man()->AppendTrendLineStrategy(line);
                     del_unnecessary_uplines(app_, k_datas, cst_cur_index, *p_trend_up_line_container, *p_line);
                 }

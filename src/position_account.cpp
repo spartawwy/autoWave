@@ -68,8 +68,8 @@ std::string PositionAtom::String()
 
 std::string PosAtomHelpInfo::ToString()
 {
-    return utility::FormatStr("remain:%d |%d %d %d %.1f %.1f %.1f"
-        , is_remain, has_near_small_aim, has_near_mid_aim, has_near_big_aim, small_aim, mid_aim, big_aim);
+    return utility::FormatStr("remain:%d |%d %d %d %.1f %.1f %.1f | %u"
+        , is_remain, has_near_small_aim, has_near_mid_aim, has_near_big_aim, small_aim, mid_aim, big_aim, strategy_id);
 }
 //---------------------- 
 unsigned int PositionInfo::LongPosQty(int target_status)

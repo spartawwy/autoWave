@@ -244,7 +244,8 @@ void BreakUpStrategy::JudgeStopLongLoss(const T_QuoteData &quote, INOUT unsigned
     {
         int trade_id = iter->first;
         auto pos_atom = account_info_.position.FindPositionAtom(trade_id);
-        if( pos_atom )
+        if( !pos_atom || pos_atom->help_info.strategy_id != id_ )
+            continue; 
         {
             if( quote.price < pos_atom->stop_loss_price + cst_tolerance_equal )
             {  
@@ -271,8 +272,8 @@ void BreakUpStrategy::JudgeStopLongProfit(const T_QuoteData &quote)
     {
         int trade_id = iter->first;
         auto pos_atom = account_info_.position.FindPositionAtom(trade_id);
-        if( !pos_atom )
-            continue;
+        if( !pos_atom || pos_atom->help_info.strategy_id != id_ )
+            continue; 
         assert(pos_atom->qty_all() == 1);
         if( quote.price > pos_atom->stop_profit_price - cst_tolerance_equal )
         {

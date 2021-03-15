@@ -21,9 +21,8 @@ Strategy::Strategy(FuturesForecastApp &app, AccountInfo &account_info)
     , main_hisdatas_(nullptr)
     , sub_hisdatas_(nullptr)
     , pre_price_(-1.0)
-{
-    account_info_.capital.avaliable = cst_default_ori_capital;
-
+    , id_(app.strategy_man()->GenerateId())
+{  
     main_forcast_ = app_.main_window()->MainKlineWall()->auto_forcast_man();
 
     code_ = app_.main_window()->MainKlineWall()->stock_code();
@@ -69,8 +68,8 @@ bool Strategy::ProdIfNearTradingEndTime(const T_QuoteData &quote)
             int trade_id = iter->first;
             auto pos_atom = account_info_.position.FindPositionAtom(trade_id);
             if( pos_atom )
-            {
-                if( pos_atom->help_info.is_remain && !is_next_day_rest )
+            { 
+                if( pos_atom->help_info.strategy_id != id_ || (pos_atom->help_info.is_remain && !is_next_day_rest) )
                     continue;
                 assert(pos_atom->qty_all() == 1);
                 double margin_ret = 0.0;
@@ -80,7 +79,8 @@ bool Strategy::ProdIfNearTradingEndTime(const T_QuoteData &quote)
                 {
                     account_info_.capital.frozen -= margin_ret;
                     account_info_.capital.avaliable += margin_ret + p_profit;
-                }
+                }else
+                    account_info_.capital.avaliable += p_profit;
                 assert(short_pos_qty > 0);
                 short_pos_qty -= 1; 
                 app_.strategy_man()->AppendTradeRecord(OrderAction::CLOSE, *pos_atom, quote, main_hisdatas_->size() - 1);
@@ -96,7 +96,7 @@ bool Strategy::ProdIfNearTradingEndTime(const T_QuoteData &quote)
             auto pos_atom = account_info_.position.FindPositionAtom(trade_id);
             if( pos_atom )
             {
-                if( pos_atom->help_info.is_remain && !is_next_day_rest )
+                if( pos_atom->help_info.strategy_id != id_ || (pos_atom->help_info.is_remain && !is_next_day_rest) )
                     continue;
                 assert(pos_atom->qty_all() == 1);
                 double margin_ret = 0.0;
@@ -106,7 +106,8 @@ bool Strategy::ProdIfNearTradingEndTime(const T_QuoteData &quote)
                 {
                     account_info_.capital.frozen -= margin_ret;
                     account_info_.capital.avaliable += margin_ret + p_profit;
-                }
+                }else
+                    account_info_.capital.avaliable += p_profit;
                 assert(long_pos_qty > 0);
                 long_pos_qty -= 1; 
                 app_.strategy_man()->AppendTradeRecord(OrderAction::CLOSE, *pos_atom, quote, main_hisdatas_->size() - 1);
@@ -127,10 +128,13 @@ unsigned int Strategy::NetPosition()
     return MAX_VAL(long_pos, short_pos);
 }
 
-void Strategy::ClosePositionAtom(const T_QuoteData &quote, int trade_id, PositionAtom *pos_atom, unsigned int short_pos_qty, unsigned int &long_pos_qty)
+void Strategy::ClosePositionAtom(const T_QuoteData &quote, int trade_id, PositionAtom *pos_atom, unsigned int &short_pos_qty, unsigned int &long_pos_qty)
 {
+    assert(pos_atom);
     double margin_ret = 0.0;
     double p_profit = 0.0;
+    if( pos_atom->is_long )
+    { 
     auto temp_val = long_pos_qty;
     account_info_.position.ClosePositionAtom(trade_id, quote.price, &margin_ret, &p_profit);
     if( temp_val > short_pos_qty )
@@ -146,6 +150,24 @@ void Strategy::ClosePositionAtom(const T_QuoteData &quote, int trade_id, Positio
         , quote.price, pos_atom->String().c_str()
         , pos_atom->float_stop_profit ? pos_atom->float_stop_profit->String(quote.price).c_str() : ""
         , p_profit, account_info_.capital.total()), &quote);
+    }else
+    {
+        auto temp_val = short_pos_qty;
+        account_info_.position.ClosePositionAtom(trade_id, quote.price, &margin_ret, &p_profit);
+        if( temp_val > long_pos_qty )
+        {
+            account_info_.capital.frozen -= margin_ret;
+            account_info_.capital.avaliable += margin_ret + p_profit;
+        }else
+            account_info_.capital.avaliable += p_profit;
+        assert(short_pos_qty > 0);
+        --short_pos_qty;
+        app_.strategy_man()->AppendTradeRecord(OrderAction::CLOSE, *pos_atom, quote, main_hisdatas_->size() - 1);
+        this->Strategy_Log(utility::FormatStr("Stop loss or fprofit SHORT: price:%.1f %s (%s) profit:%.1f capital:%.1f"
+            , quote.price, pos_atom->String().c_str()
+            , pos_atom->float_stop_profit ? pos_atom->float_stop_profit->String(quote.price).c_str() : ""
+            , p_profit, account_info_.capital.total()), &quote);
+    }
 }
 
 void Strategy::Strategy_Log(const std::string &content, const T_QuoteData *quote)
