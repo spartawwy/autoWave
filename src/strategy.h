@@ -19,6 +19,7 @@ public:
     virtual void Initiate(){}
     virtual void Handle(const T_QuoteData &quote) = 0;
     unsigned int id(){ return id_; }
+    AccountInfo & account_info(){ return account_info_; }
 
 protected:
 
@@ -30,7 +31,7 @@ protected:
      
     virtual bool ProdIfNearTradingEndTime(const T_QuoteData &quote);
     virtual void Strategy_Log(const std::string &content, const T_QuoteData *quote=nullptr);
-    
+     
 protected:
 
     FuturesForecastApp &app_;

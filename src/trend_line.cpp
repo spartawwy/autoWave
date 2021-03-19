@@ -12,12 +12,14 @@
 #define  TAG_TREND_LINE_LOG  "trendline"
 
 const static double cst_up_line_slop_min = 0.015;
+const static double cst_down_line_slop_min = -0.015;
 
 using namespace TSystem;
 void TrendLine::SetDead()
 { 
     is_alive_ = false;
 }
+
 TrendLine * TrendLineMan::CreateTrendUpLine(const std::string &code, TypePeriod type_period, TrendLine *p_last_trend_up_line)
 { 
     //TrendLine * p_ret_line = nullptr;
@@ -28,140 +30,30 @@ TrendLine * TrendLineMan::CreateTrendUpLine(const std::string &code, TypePeriod 
     int cst_cur_index = k_datas.size() - 1;
 
     int left_end_index = GetLeftEndIndex(code, type_period);
-
     
     int lowest_index = Lowest(k_datas, cst_cur_index, left_end_index - cst_cur_index);
     int highest_index = Highest(k_datas, cst_cur_index, left_end_index - cst_cur_index);
     if( left_end_index >= highest_index )
         return nullptr;
-#if 1
     return __CreateTrendUpLine(code, type_period, left_end_index, highest_index, false, p_last_trend_up_line);
-#else 
-    if( lowest_index == highest_index )
+}
+
+TrendLine *  TrendLineMan::CreateTrendDownLine(const std::string &code, TypePeriod type_period, TrendLine *p_last_trend_down_line)
+{
+    T_HisDataItemContainer &k_datas = app_.stock_data_man().GetHisDataContainer(type_period, code);
+    if( k_datas.size() < 2 )
         return nullptr;
 
-    const double mid_axis_slop = CaculateMidAxisSlop(code, type_period);
-    if( lowest_index > highest_index )
-    { 
-        auto trend_down_line = std::make_shared<TrendLine>(TrendLineType::DOWN);
-        // todo:
-        return trend_down_line.get();
-    }else
-    {
-        auto trend_up_line = std::make_shared<TrendLine>(TrendLineType::UP);
-        /****************
-                b
-               /|
-              / |
-             /  |
-          a /___|c
-        ***************/
-#if 1 
-        double first_slop = 0.0;
-        int first_low_end_i = SolveTrendUpLineEndIndex(k_datas, lowest_index, highest_index, first_slop);
-        if( first_low_end_i < 0 ) // fail
-            return nullptr;
-        //----------find first_low_end_i which slop > 0.01 -----------
-        int temp_low_index = lowest_index;
-        while( first_slop < cst_up_line_slop_min && temp_low_index < highest_index )
-        {
-            auto btms = FindFractalsBetween(k_datas, FractalGeneralType::BTM_FRACTAL, highest_index, temp_low_index+1);
-            int lowest_i_in_btms = 0;
-            double min_price_in_btms = MAX_PRICE;
-            for( unsigned int i = 0; i < btms.size(); ++i )
-            {
-                auto price = KRef(k_datas, btms[i], KAttributeType::LOW);
-                if( price < min_price_in_btms + EPSINON )
-                {
-                    lowest_i_in_btms = btms[i];
-                    min_price_in_btms = price;
-                }
-            }
-            if( lowest_i_in_btms > 0 )
-            { 
-                first_low_end_i = SolveTrendUpLineEndIndex(k_datas, lowest_i_in_btms, highest_index, first_slop);
-                if( first_low_end_i > -1 && first_slop > cst_up_line_slop_min - EPSINON )
-                {
-                    lowest_index = lowest_i_in_btms;
-                    break;
-                }else
-                {
-                    temp_low_index = lowest_i_in_btms;
-                }
-            }else
-                return nullptr;
-        }//while 
-        assert(first_low_end_i > lowest_index);
-        trend_up_line->slope_ = first_slop;
-        trend_up_line->beg_ = lowest_index;
-        trend_up_line->end_ = first_low_end_i;
-        trend_up_line->h_price_index_ = highest_index;
-        trend_up_line->l_price_index_ = lowest_index;
-        // consider second low i :考虑次低点
-        do
-        {
-            if( mid_axis_slop < cst_up_line_slop_min )
-                break; 
-            auto btms = FindFractalsBetween(k_datas, FractalGeneralType::BTM_FRACTAL, highest_index, lowest_index+1);
-            int lowest_i_in_btms = 0;
-            double min_price_in_btms = MAX_PRICE;
-            for( unsigned int i = 0; i < btms.size(); ++i )
-            {
-                auto price = KRef(k_datas, btms[i], KAttributeType::LOW);
-                if( price < min_price_in_btms + EPSINON )
-                {
-                    lowest_i_in_btms = btms[i];
-                    min_price_in_btms = price;
-                }
-            }
-            if( lowest_i_in_btms <= 0 )
-                break;
-            double second_slot = 0.0;
-            int second_low_end_i = SolveTrendUpLineEndIndex(k_datas, lowest_i_in_btms, highest_index, second_slot);
-            if( second_low_end_i < 0 )
-                break;
-            if( fabs(first_slop - mid_axis_slop) < fabs(second_slot - mid_axis_slop) + 0.005 )
-                break;
+    int cst_cur_index = k_datas.size() - 1;
 
-            auto line_use_second_low = std::make_shared<TrendLine>(TrendLineType::UP);
-            line_use_second_low->slope_ = second_slot;
-            line_use_second_low->beg_ = lowest_i_in_btms;
-            line_use_second_low->end_ = second_low_end_i;
-            line_use_second_low->h_price_index_ = highest_index;
-            line_use_second_low->l_price_index_ = lowest_i_in_btms;
+    int left_end_index = GetLeftEndIndex(code, type_period);
 
-            double distance = fabs(TrendLineValue(k_datas, *trend_up_line, cst_cur_index) - TrendLineValue(k_datas, *line_use_second_low, cst_cur_index));
-            if( distance < 0.5 )
-                break;
-             
-            if( p_last_trend_up_line && p_last_trend_up_line->beg_ == lowest_i_in_btms && p_last_trend_up_line->end_ == second_low_end_i )
-            {
-                p_last_trend_up_line->h_price_index_ = highest_index;
-                p_last_trend_up_line->is_double_top_ = false;
-                return p_last_trend_up_line;
-            }else 
-            {
-                auto p_line = AppendTrendLine(code, type_period, line_use_second_low, true);
-                return p_line;
-            } 
-        }while(0);// consider second low 
 
-        if( p_last_trend_up_line && p_last_trend_up_line->beg_ == lowest_index && p_last_trend_up_line->end_ == first_low_end_i )
-        {
-            p_last_trend_up_line->h_price_index_ = highest_index;
-            p_last_trend_up_line->is_double_top_ = false;
-            return p_last_trend_up_line;
-        }else
-        { 
-            auto p_line = AppendTrendLine(code, type_period, trend_up_line);
-            return p_line;
-        }
-         
-#endif
-    } // trend up line
-     
-    return nullptr;
-#endif
+    int lowest_index = Lowest(k_datas, cst_cur_index, left_end_index - cst_cur_index);
+    int highest_index = Highest(k_datas, cst_cur_index, left_end_index - cst_cur_index);
+    if( left_end_index >= lowest_index )
+        return nullptr;
+    return __CreateTrendDownLine(code, type_period, left_end_index, lowest_index, false, p_last_trend_down_line);
 }
 
 TrendLine * TrendLineMan::__CreateTrendUpLine(const std::string &code, TypePeriod type_period, int left_index, int right_index, bool is_db_top, TrendLine *p_last_trend_up_line)
@@ -293,6 +185,145 @@ TrendLine * TrendLineMan::__CreateTrendUpLine(const std::string &code, TypePerio
     }else
     {  
         auto p_line = AppendTrendLine(code, type_period, trend_up_line);
+        assert(p_line);
+        if( is_db_top )
+            p_line->is_double_top_ = is_db_top;
+        return p_line;
+    }
+#endif
+    return nullptr;
+}
+
+TrendLine *  TrendLineMan::__CreateTrendDownLine(const std::string &code, TypePeriod type_period, int left_index, int right_index, bool is_db_top, TrendLine *p_last_trend_down_line)
+{
+    T_HisDataItemContainer &k_datas = app_.stock_data_man().GetHisDataContainer(type_period, code);
+    if( k_datas.size() < 2 )
+        return nullptr;
+
+    int cst_cur_index = k_datas.size() - 1;
+
+    assert(left_index < right_index); 
+
+    int lowest_index = Lowest(k_datas, cst_cur_index, left_index - cst_cur_index);
+    int highest_index = Highest(k_datas, cst_cur_index, left_index - cst_cur_index);
+
+    if( lowest_index <= highest_index )
+        return nullptr;
+
+    const double mid_axis_slop = CaculateMidAxisSlop(code, type_period);
+     
+    auto trend_down_line = std::make_shared<TrendLine>(TrendLineType::DOWN);
+    /****************
+            b
+           /|
+          / |
+         /  |
+      a /___|c
+    ***************/
+#if 1 
+    double first_slop = 0.0;
+    int first_high_end_i = SolveTrendDownLineEndIndex(k_datas, highest_index, right_index, first_slop);
+    if( first_high_end_i < 0 ) // fail
+        return nullptr;
+    //----------find first_high_end_i which slop < -0.01 -----------
+    int temp_high_index = highest_index;
+    while( first_slop > cst_down_line_slop_min && temp_high_index < right_index )
+    {
+        auto tops = FindFractalsBetween(k_datas, FractalGeneralType::TOP_FRACTAL, right_index, temp_high_index+1);
+        int highest_i_in_tops = 0;
+        double max_price_in_tops = MIN_PRICE;
+        for( unsigned int i = 0; i < tops.size(); ++i )
+        {
+            auto price = KRef(k_datas, tops[i], KAttributeType::HIGH);
+            if( price > max_price_in_tops - EPSINON )
+            {
+                highest_i_in_tops = tops[i];
+                max_price_in_tops = price;
+            }
+        }
+        if( highest_i_in_tops > 0 )
+        { 
+            first_high_end_i = SolveTrendDownLineEndIndex(k_datas, highest_i_in_tops, right_index, first_slop);
+            if( first_high_end_i > -1 && first_slop < cst_down_line_slop_min + EPSINON )
+            {
+                highest_index = highest_i_in_tops;
+                break;
+            }else
+            {
+                temp_high_index = highest_i_in_tops;
+            }
+        }else
+            return nullptr;
+    }//while 
+    assert(first_high_end_i > highest_index);
+    trend_down_line->slope_ = first_slop;
+    trend_down_line->beg_ = highest_index;
+    trend_down_line->end_ = first_high_end_i;
+    trend_down_line->h_price_index_ = highest_index;
+    trend_down_line->l_price_index_ = lowest_index;
+    trend_down_line->is_double_top_ = is_db_top;
+#if 0
+    // consider second high i :考虑次高点
+    do
+    {
+        if( mid_axis_slop < cst_up_line_slop_min )
+            break; 
+        auto btms = FindFractalsBetween(k_datas, FractalGeneralType::BTM_FRACTAL, right_index, lowest_index+1);
+        int lowest_i_in_btms = 0;
+        double min_price_in_btms = MAX_PRICE;
+        for( unsigned int i = 0; i < btms.size(); ++i )
+        {
+            auto price = KRef(k_datas, btms[i], KAttributeType::LOW);
+            if( price < min_price_in_btms + EPSINON )
+            {
+                lowest_i_in_btms = btms[i];
+                min_price_in_btms = price;
+            }
+        }
+        if( lowest_i_in_btms <= 0 )
+            break;
+        double second_slot = 0.0;
+        int second_low_end_i = SolveTrendUpLineEndIndex(k_datas, lowest_i_in_btms, right_index, second_slot);
+        if( second_low_end_i < 0 )
+            break;
+        if( fabs(first_slop - mid_axis_slop) < fabs(second_slot - mid_axis_slop) + 0.005 )
+            break;
+
+        auto line_use_second_low = std::make_shared<TrendLine>(TrendLineType::UP);
+        line_use_second_low->slope_ = second_slot;
+        line_use_second_low->beg_ = lowest_i_in_btms;
+        line_use_second_low->end_ = second_low_end_i;
+        line_use_second_low->h_price_index_ = highest_index;
+        line_use_second_low->l_price_index_ = lowest_i_in_btms;
+        line_use_second_low->is_double_top_ = is_db_top;
+
+        double distance = fabs(TrendLineValue(k_datas, *trend_up_line, cst_cur_index) - TrendLineValue(k_datas, *line_use_second_low, cst_cur_index));
+        if( distance < 0.5 )
+            break;
+             
+        if( p_last_trend_up_line && p_last_trend_up_line->beg_ == lowest_i_in_btms && p_last_trend_up_line->end_ == second_low_end_i )
+        {
+            p_last_trend_up_line->h_price_index_ = highest_index;
+            p_last_trend_up_line->is_double_top_ = is_db_top;
+            return p_last_trend_up_line;
+        }else 
+        {
+            auto p_line = AppendTrendLine(code, type_period, line_use_second_low, true);
+            assert(p_line);
+            if( is_db_top )
+                p_line->is_double_top_ = is_db_top;
+            return p_line;
+        } 
+    }while(0);// consider second high 
+#endif
+    if( p_last_trend_down_line && p_last_trend_down_line->beg_ == lowest_index && p_last_trend_down_line->end_ == first_high_end_i )
+    {
+        p_last_trend_down_line->l_price_index_ = lowest_index;
+        p_last_trend_down_line->is_double_top_ = is_db_top;
+        return p_last_trend_down_line;
+    }else
+    {  
+        auto p_line = AppendTrendLine(code, type_period, trend_down_line);
         assert(p_line);
         if( is_db_top )
             p_line->is_double_top_ = is_db_top;
@@ -630,18 +661,8 @@ void  TrendLineMan::Update(const std::string &code, TypePeriod type_period, int 
     bool is_k_close = true;
     
     if( is_k_close )
-    { 
-#if 0 
-        int right_end_index = cst_cur_index;
-        int left_end_index = MAX_VAL(cst_cur_index - 1 - 5, 0);
-        double h_price_in_lefts = Highest(k_datas, cst_cur_index - 1, left_end_index - (cst_cur_index - 1));
-        if( quote_k.high_price > h_price_in_lefts )
-        {
-            const double mid_axis_slop = CaculateMidAxisSlop(code, type_period);
-            if( mid_axis_slop > 0.01 )
-                bool ret = CreateTrendUpLine(code, type_period);
-        }
-#endif
+    {  
+#ifdef DRAW_UP_LINE
         if( !last_trend_up_line_ )
         {
             int left_end_index = MAX_VAL(cst_cur_index - 20, 0);
@@ -668,6 +689,7 @@ void  TrendLineMan::Update(const std::string &code, TypePeriod type_period, int 
 
             return;
         }
+
         assert(p_trend_up_line_container);
         assert(last_trend_up_line_);
         if( quote_k.high_price > KRef(k_datas, last_trend_up_line_->h_price_index_, KAttributeType::HIGH) )
@@ -683,31 +705,7 @@ void  TrendLineMan::Update(const std::string &code, TypePeriod type_period, int 
                 assert(line);
                 app_.strategy_man()->AppendTrendLineStrategy(line);
                 del_unnecessary_uplines(app_, k_datas, cst_cur_index, *p_trend_up_line_container, *p_line);
-#if 0
-                std::deque<std::shared_ptr<TrendLine> > alive_lines;
-                for( unsigned int i = 0; i < p_trend_up_line_container->size(); ++i )
-                {
-                    auto &line = p_trend_up_line_container->at(i);
-                    if( !line->is_alive_ )
-                        continue;
-                    alive_lines.push_back(line);
-                }
-                SortTrendLines(k_datas, cst_cur_index, alive_lines, false);
-                unsigned int w = 0;
-                for( ; w < alive_lines.size(); ++w )
-                {
-                    if( alive_lines[w]->id_ == p_line->id_ )
-                        break;
-                }
-                assert(w <= alive_lines.size() );
-
-                for( unsigned int j = w + 2; j < alive_lines.size(); ++j )
-                {
-                    app_.local_logger().LogLocal(TAG_TREND_LINE_LOG
-                        , utility::FormatStr("set line(id:%d) dead cur_index:%d | line below new create line's down one", alive_lines[j]->id_, cst_cur_index));
-                    alive_lines[j]->SetDead();
-                }
-#endif
+ 
             }
         }else if( !last_trend_up_line_->is_double_top_ 
             && cst_cur_index > last_trend_up_line_->h_price_index_ + 2
@@ -746,7 +744,54 @@ void  TrendLineMan::Update(const std::string &code, TypePeriod type_period, int 
                 }
             }
         }// consider double top shape
-    }
+#endif
+
+        if( !last_trend_down_line_ )
+        {
+            int left_end_index = MAX_VAL(cst_cur_index - 20, 0);
+            if( KRef(k_datas, cst_cur_index, KAttributeType::LOW) < KRef(k_datas, cst_cur_index - 1, KAttributeType::LOW)
+                && FractalLast(k_datas, FractalGeneralType::TOP_FRACTAL, cst_cur_index, left_end_index) > -1 )
+            {
+                const double mid_axis_slop = CaculateMidAxisSlop(code, type_period);
+                if( mid_axis_slop < -0.01 )
+                {
+                    app_.local_logger().LogLocal(TAG_TREND_LINE_LOG
+                        , utility::FormatStr("last_trend_down_line_ null to judge CreateTrendDownLine"));
+                    unsigned int last_line_id = line_id_;
+                    auto p_line = CreateTrendDownLine(code, type_period);
+                    if( last_line_id != line_id_ )
+                    {
+                        assert(p_line);
+                        auto line = FindTrendLineById(line_id_);
+                        assert(line);
+                        assert(p_line->id_ == line->id_);
+                        app_.strategy_man()->AppendTrendLineStrategy(line);
+                    }
+                }
+            }
+
+            return;
+        }
+
+        assert(p_trend_down_line_container);
+        assert(last_trend_down_line_);
+        if( quote_k.low_price < KRef(k_datas, last_trend_down_line_->l_price_index_, KAttributeType::LOW) )
+        {
+            app_.local_logger().LogLocal(TAG_TREND_LINE_LOG
+                , utility::FormatStr("cur_index %d low price < last_trend_down_line_(id%d) l_price_index_:%d to judge CreateTrendDownLine"
+                , cst_cur_index, last_trend_down_line_->id_, last_trend_down_line_->l_price_index_));
+            auto p_line = CreateTrendDownLine(code, type_period, last_trend_down_line_.get());
+
+            if( p_line && p_line->id_ > last_trend_down_line_->id_ )
+            {
+                auto line = FindTrendLineById(p_line->id_);
+                assert(line);
+                app_.strategy_man()->AppendTrendLineStrategy(line);
+                //del_unnecessary_uplines(app_, k_datas, cst_cur_index, *p_trend_up_line_container, *p_line);
+
+            }
+        }
+    } // close k
 }
 
 
@@ -934,8 +979,15 @@ TrendLine * TrendLineMan::AppendTrendLine(const std::string &code, TypePeriod ty
     return trend_line.get();
 }
 
-auto TrendLineMan::SolveTrendUpLineEndIndex(T_HisDataItemContainer &k_datas, int lowest_index, int highest_index, OUT double &rel_slop) ->int
-{
+int TrendLineMan::SolveTrendUpLineEndIndex(T_HisDataItemContainer &k_datas, int lowest_index, int highest_index, OUT double &rel_slop)
+{ 
+     /****************
+            b
+           /|
+          /c|
+         /  |
+      a /___| 
+    ***************/
     const double a_price = KRef(k_datas, lowest_index, KAttributeType::LOW);
     // from highest_index to lowest_index (lowest_index, highest_index] search point c
     int i = highest_index;
@@ -953,7 +1005,7 @@ auto TrendLineMan::SolveTrendUpLineEndIndex(T_HisDataItemContainer &k_datas, int
         double a_edge_length = b_price - a_price;
         double slope = a_edge_length / (i - lowest_index);
 
-        // judge if break the temp trend line ---
+        // judge if break down the temp trend line ---
         double lowest_price = KRef(k_datas, i, KAttributeType::LOW);
         int j = i - 1;
         for( ; j > lowest_index; --j )
@@ -966,6 +1018,56 @@ auto TrendLineMan::SolveTrendUpLineEndIndex(T_HisDataItemContainer &k_datas, int
             lowest_price = j_low;
         }
         if( j == lowest_index ) // fit
+        {
+            rel_slop = slope;
+            return i;
+        }
+        --i;
+    } // while
+    return -1;
+}
+
+
+int TrendLineMan::SolveTrendDownLineEndIndex(T_HisDataItemContainer &k_datas, int highest_index, int lowest_index, OUT double &rel_slop)
+{
+    /****************
+            a
+            |\
+            | \c
+            |  \
+            |   \b
+    ***************/
+    assert(highest_index < lowest_index);
+    const double a_price = KRef(k_datas, highest_index, KAttributeType::HIGH);
+    // from lowest_index to highest_index  [lowest_index, highest_index) search point c
+    int i = lowest_index;
+    double pre_b_price = KRef(k_datas, i, KAttributeType::HIGH);
+    while( i > highest_index )
+    {
+        double b_price = KRef(k_datas, i, KAttributeType::HIGH);
+        if( b_price < pre_b_price )
+        {
+            --i;
+            continue;
+        }
+        pre_b_price = b_price;
+        // use i as end_index to create temp trend down line 
+        double a_edge_length = b_price - a_price;
+        double slope = a_edge_length / (i - highest_index);
+
+        // judge if break up the temp trend line ---
+        double highest_price = KRef(k_datas, i, KAttributeType::HIGH);
+        int j = i - 1;
+        for( ; j > highest_index; --j )
+        {
+            double j_high = KRef(k_datas, j, KAttributeType::HIGH);
+            if( !(j_high > highest_price) )
+                continue;
+            if( j_high > (j - highest_index) * slope + a_price ) // break up the temp trend down line
+                break;
+            highest_price = j_high;
+        }
+        if( j == highest_index ) // fit
         {
             rel_slop = slope;
             return i;

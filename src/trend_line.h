@@ -102,6 +102,7 @@ public:
         : app_(app)/*, down_line_(TrendLine(TrendLineType::DOWN)), up_line_(TrendLine(TrendLineType::UP))*/
         , last_date_(0)
         , last_trend_up_line_(nullptr)
+        , last_trend_down_line_(nullptr)
     {
         line_id_ = 0;
     }
@@ -110,6 +111,9 @@ public:
     TrendLine *  CreateTrendUpLine(const std::string &code, TypePeriod type_period, TrendLine *p_last_trend_up_line=nullptr);
     TrendLine *  CreateTrendUpLineByDoubleTop(const std::string &code, TypePeriod type_period, int left_index, int right_index);
     TrendLine *  __CreateTrendUpLine(const std::string &code, TypePeriod type_period, int left_index, int right_index, bool db_top, TrendLine *p_last_trend_up_line=nullptr);
+
+    TrendLine *  CreateTrendDownLine(const std::string &code, TypePeriod type_period, TrendLine *p_last_trend_down_line=nullptr);
+    TrendLine *  __CreateTrendDownLine(const std::string &code, TypePeriod type_period, int left_index, int right_index, bool db_top, TrendLine *p_last_trend_down_line=nullptr);
 
     void  Update(const std::string &code, TypePeriod type_period, int k_index, const T_StockHisDataItem &quote_k);
 
@@ -148,6 +152,7 @@ public:
     }
 private:
     int SolveTrendUpLineEndIndex(T_HisDataItemContainer &k_datas, int lowest_index, int highest_index, OUT double &rel_slop);
+    int SolveTrendDownLineEndIndex(T_HisDataItemContainer &k_datas, int highest_index, int lowest_index, OUT double &rel_slop);
 
 private:
     FuturesForecastApp &app_;
@@ -156,6 +161,7 @@ private:
     int last_date_;
     std::atomic<unsigned int> line_id_;
     std::shared_ptr<TrendLine> last_trend_up_line_;
+    std::shared_ptr<TrendLine> last_trend_down_line_;
     //<code, ...>
     std::unordered_map<std::string, std::unordered_map<TypePeriod, std::unordered_map<TrendLineType, std::deque<std::shared_ptr<TrendLine> > > > > code_type_trend_lines_;
     std::unordered_map<unsigned int, std::shared_ptr<TrendLine> > id_trend_lines_;

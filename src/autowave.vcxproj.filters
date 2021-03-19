@@ -269,10 +269,10 @@
     <ClCompile Include="trend_line.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="trend_up_line_strategy.cpp">
+    <ClCompile Include="line_strategy_man.cpp">
       <Filter>Strategy</Filter>
     </ClCompile>
-    <ClCompile Include="line_strategy_man.cpp">
+    <ClCompile Include="up_line_strategy.cpp">
       <Filter>Strategy</Filter>
     </ClCompile>
   </ItemGroup>
@@ -465,10 +465,10 @@
     <ClInclude Include="trend_line.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="trend_up_line_strategy.h">
+    <ClInclude Include="line_strategy_man.h">
       <Filter>Strategy</Filter>
     </ClInclude>
-    <ClInclude Include="line_strategy_man.h">
+    <ClInclude Include="up_line_strategy.h">
       <Filter>Strategy</Filter>
     </ClInclude>
   </ItemGroup>

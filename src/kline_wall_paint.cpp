@@ -641,8 +641,24 @@ void KLineWall::DrawTrendLine(QPainter &painter, const int mm_h)
             down_line_pen.setColor(Qt::green);
             down_line_pen.setWidth(1);
             painter.setPen(down_line_pen);
-            painter.drawLine(his_data[p_trend_down_line->beg_]->kline_posdata(wall_index_).top  
-                , his_data[p_trend_down_line->end_]->kline_posdata(wall_index_).top);
+            //painter.drawLine(his_data[p_trend_down_line->beg_]->kline_posdata(wall_index_).top  
+            //    , his_data[p_trend_down_line->end_]->kline_posdata(wall_index_).top);
+
+            double start_index_price = (start_index - p_trend_down_line->end_) * p_trend_down_line->slope_ + KRef(his_data, p_trend_down_line->end_, KAttributeType::HIGH);
+            double end_index_price = (end_index - p_trend_down_line->end_) * p_trend_down_line->slope_ + KRef(his_data, p_trend_down_line->end_, KAttributeType::HIGH);
+            double start_index_y = get_price_y(start_index_price, mm_h);
+            double end_index_y = get_price_y(end_index_price, mm_h);
+            QPointF start_index_point(his_data[start_index]->kline_posdata(wall_index_).bottom.x(), start_index_y);
+            QPointF end_index_point(his_data[end_index]->kline_posdata(wall_index_).bottom.x(), end_index_y);
+            painter.drawLine(start_index_point  //his_data[p_trend_up_line->end_]->kline_posdata(wall_index_).bottom
+                , end_index_point);
+
+            char buf[128] = {'\0'};
+            sprintf_s(buf, sizeof(buf), "%d(%.4f)", p_trend_down_line->id_, p_trend_down_line->slope_);
+            QPen pen; 
+            pen.setColor(Qt::darkYellow);
+            painter.setPen(pen);
+            painter.drawText(end_index_point, buf);
             
         }
     }

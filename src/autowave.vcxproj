@@ -214,7 +214,7 @@
     <ClCompile Include="trenddown_strategy.cpp" />
     <ClCompile Include="trend_distinguish.cpp" />
     <ClCompile Include="trend_line.cpp" />
-    <ClCompile Include="trend_up_line_strategy.cpp" />
+    <ClCompile Include="up_line_strategy.cpp" />
     <ClCompile Include="wave.cpp" />
     <ClCompile Include="zhibiao.cpp" />
     <ClCompile Include="zhibiao_window.cpp" />
@@ -255,7 +255,7 @@
     <ClInclude Include="breakup_strategy.h" />
     <ClInclude Include="line_strategy_man.h" />
     <ClInclude Include="trend_line.h" />
-    <ClInclude Include="trend_up_line_strategy.h" />
+    <ClInclude Include="up_line_strategy.h" />
     <ClInclude Include="wave.h" />
     <CustomBuild Include="capital_curve.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>

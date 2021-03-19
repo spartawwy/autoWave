@@ -1,4 +1,4 @@
-#include "trend_up_line_strategy.h"
+#include "up_line_strategy.h"
 
 #include <Tlib/core/tsystem_core_common.h>
 
@@ -117,7 +117,7 @@ void TrendUpLineStrategy::JudgeOpenLong(const T_QuoteData &quote, unsigned int s
             long_pos_qty += 1;
             app_.strategy_man()->AppendTradeRecord(OrderAction::OPEN, *positon_atom, quote, cur_k_index); 
             Strategy_Log(utility::FormatStr("order open LONG pos: %s fee:%.1f frozen:%.1f ava:%.1f line_id:%d line_value:%.1f index:%d"
-                , positon_atom->String().c_str(), fee, account_info_.capital.frozen, account_info_.capital.avaliable, trend_line_->id_, line_value, cur_k_index), &quote);
+                , positon_atom->String(false).c_str(), fee, account_info_.capital.frozen, account_info_.capital.avaliable, trend_line_->id_, line_value, cur_k_index), &quote);
         }
         if( real_long_pos_allow > 0 )
             long_records_[cur_k_index] = true;
@@ -169,7 +169,7 @@ void TrendUpLineStrategy::JudgeStopLongLoss(const T_QuoteData &quote, unsigned i
             --long_pos_qty;
             app_.strategy_man()->AppendTradeRecord(OrderAction::CLOSE, *pos_atom, quote, main_hisdatas_->size() - 1);
             Strategy_Log(utility::FormatStr("order stop loss or float profit LONG pos: price:%.1f %s profit:%.1f capital:%.1f line_id:%d line_value:%.1f index:%d"
-                , quote.price, pos_atom->String().c_str(), p_profit, account_info_.capital.total(), trend_line_->id_, line_value, cur_k_index), &quote);
+                , quote.price, pos_atom->String(false).c_str(), p_profit, account_info_.capital.total(), trend_line_->id_, line_value, cur_k_index), &quote);
         } 
     } 
     
@@ -205,7 +205,7 @@ void TrendUpLineStrategy::JudgeStopLongProfit(const T_QuoteData &quote)
             long_pos_qty -= 1;
             app_.strategy_man()->AppendTradeRecord(OrderAction::CLOSE, *pos_atom, quote, main_hisdatas_->size() - 1);
             Strategy_Log(utility::FormatStr("order stop profit LONG pos: price:%.1f %s profit:%.1f capital:%.1f"
-                , quote.price, pos_atom->String().c_str(), p_profit, account_info_.capital.total()), &quote);
+                , quote.price, pos_atom->String(false).c_str(), p_profit, account_info_.capital.total()), &quote);
         }
     }
 }
@@ -281,7 +281,7 @@ void TrendUpLineStrategy::JudgeOpenShort(const T_QuoteData &quote, INOUT unsigne
             short_pos_qty += 1;
             app_.strategy_man()->AppendTradeRecord(OrderAction::OPEN, *positon_atom, quote, cur_k_index); 
             Strategy_Log(utility::FormatStr("order open SHORT pos: %s fee:%.1f frozen:%.1f ava:%.1f "
-                , positon_atom->String().c_str(), fee, account_info_.capital.frozen, account_info_.capital.avaliable), &quote);
+                , positon_atom->String(false).c_str(), fee, account_info_.capital.frozen, account_info_.capital.avaliable), &quote);
         }//for
         if( real_short_pos_allow > 0 )
             short_records_[cur_k_index] = true;
@@ -316,7 +316,7 @@ void TrendUpLineStrategy::JudgeStopShortLoss(const T_QuoteData &quote, INOUT uns
             --short_pos_qty;
             app_.strategy_man()->AppendTradeRecord(OrderAction::CLOSE, *pos_atom, quote, main_hisdatas_->size() - 1);
             Strategy_Log(utility::FormatStr("order stop loss or float profit short pos: price:%.1f %s profit:%.1f capital:%.1f line_id:%d index:%d"
-                , quote.price, pos_atom->String().c_str(), p_profit, account_info_.capital.total(), trend_line_->id_, cur_k_index), &quote);
+                , quote.price, pos_atom->String(false).c_str(), p_profit, account_info_.capital.total(), trend_line_->id_, cur_k_index), &quote);
 
         }else if( pos_atom->float_stop_profit && pos_atom->float_stop_profit->UpdateAndJudgeStop(quote.price, &float_stop_ret) )
         {
@@ -358,7 +358,7 @@ void TrendUpLineStrategy::JudgeStopShortProfit(const T_QuoteData &quote)
             short_pos_qty -= 1;
             app_.strategy_man()->AppendTradeRecord(OrderAction::CLOSE, *pos_atom, quote, main_hisdatas_->size() - 1);
             Strategy_Log(utility::FormatStr("order stop profit short pos: price:%.1f %s profit:%.1f capital:%.1f"
-                , quote.price, pos_atom->String().c_str(), p_profit, account_info_.capital.total()), &quote);
+                , quote.price, pos_atom->String(false).c_str(), p_profit, account_info_.capital.total()), &quote);
 
         }else if( pos_atom->float_stop_profit && pos_atom->float_stop_profit->UpdateAndJudgeStop(quote.price, &float_stop_ret) )
         {

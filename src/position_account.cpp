@@ -58,12 +58,17 @@ unsigned int PositionAtom::qty_frozen()
     return frozened_qty;
 }
 
-std::string PositionAtom::String()
+std::string PositionAtom::String(bool show_forcast)
 {
-    return utility::FormatStr("trdid:%d %d open:%.1f stop_loss:%.1f stop_profit:%.1f qty:%d forcast:(id:%d %s %s ab_dist:%.1f) (%s)"
+    if( show_forcast )
+        return utility::FormatStr("trdid:%d %d open:%.1f stop_loss:%.1f stop_profit:%.1f qty:%d forcast:(id:%d %s %s ab_dist:%.1f) (%s)"
         , trade_id, is_long, price, stop_loss_price, stop_profit_price, qty_available
         , rel_forcast_info.forcast_id, ToString(rel_forcast_info.forcast_type).c_str(), ToString(rel_forcast_info.site_type).c_str()
         , rel_forcast_info.ab_distance, help_info.ToString().c_str() );
+    else 
+        return utility::FormatStr("trdid:%d %d open:%.1f stop_loss:%.1f stop_profit:%.1f qty:%d (%s)"
+        , trade_id, is_long, price, stop_loss_price, stop_profit_price, qty_available
+        , help_info.ToString().c_str() );
 }
 
 std::string PosAtomHelpInfo::ToString()
@@ -662,6 +667,35 @@ std::shared_ptr<PositionAtom> PositionInfo::FindPositionAtomSharedPointer(int id
         return iter->second;
     else
         return nullptr;
+}
+
+std::vector<PositionAtom*>  PositionInfo::FindPositionAtomsByStrategyId(unsigned int strategy_id)
+{
+    std::vector<PositionAtom*> ret;
+    T_PositionAtoms* containers[] = {&long_positions_, &short_positions_};
+    for( unsigned int i = 0; i < sizeof(containers)/sizeof(containers[0]); ++i )
+    {
+        for( auto iter = containers[i]->cbegin(); iter != containers[i]->cend(); ++iter )
+        {
+            if( (*iter)->help_info.strategy_id == strategy_id )
+                ret.push_back((*iter));
+        }
+    }
+    return ret;
+}
+
+bool PositionInfo::IsExistPositionAtomByStrategyId(unsigned int strategy_id)
+{
+    T_PositionAtoms* containers[] = {&long_positions_, &short_positions_};
+    for( unsigned int i = 0; i < sizeof(containers)/sizeof(containers[0]); ++i )
+    {
+        for( auto iter = containers[i]->cbegin(); iter != containers[i]->cend(); ++iter )
+        {
+            if( (*iter)->help_info.strategy_id == strategy_id )
+                return true;
+        }
+    }
+    return false;
 }
 
 void PositionInfo::RemoveAtom(int id)

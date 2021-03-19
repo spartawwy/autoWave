@@ -220,7 +220,7 @@ public:
         }
         return size;
     }
-    std::string String();
+    std::string String(bool show_forcast=true);
 
     int trade_id;
     double price; // open price
@@ -240,6 +240,8 @@ class PositionInfo
 {  
 public:
      
+    typedef std::vector<PositionAtom*> T_PositionAtoms;
+
     //PositionInfo(double open_fee=100.0, double close_fee=300.0) : open_fee_(open_fee), close_fee_(close_fee) { max_trade_id_ = 0; }
     PositionInfo() : open_fee_(cst_per_hand_open_fee), close_fee_(cst_per_hand_close_fee) { max_trade_id_ = 0; }
      
@@ -303,6 +305,9 @@ public:
     PositionAtom * FindPositionAtom(int id);
     PositionAtom * FindPositionAtomByRelForcast(int forcast_id, ForcastSiteType site, bool is_long);
     std::shared_ptr<PositionAtom> FindPositionAtomSharedPointer(int id);
+    std::vector<PositionAtom*>  FindPositionAtomsByStrategyId(unsigned int strategy_id);
+    bool IsExistPositionAtomByStrategyId(unsigned int strategy_id);
+
     TradeRecordAtom  ClosePositionAtomRetCapitalProfit(int id, double price, double *capital_ret, double *p_profit=nullptr);
     TradeRecordAtom  ClosePositionAtom(int id, double price, double *margin_ret, double *p_profit=nullptr);
     void RemoveAtom(int id);
@@ -318,7 +323,7 @@ private:
     double close_fee_;
     std::unordered_map<int, std::shared_ptr<PositionAtom> > position_holder_;
 
-    typedef std::vector<PositionAtom*> T_PositionAtoms;
+    
     T_PositionAtoms  long_positions_;
     T_PositionAtoms  short_positions_;
 
